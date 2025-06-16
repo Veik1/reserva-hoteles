@@ -3,8 +3,7 @@ import { defineStore } from 'pinia'
 export const useAuthStore = defineStore('auth', {
     state: () => ({
         user: null,
-        role: null,
-        token: localStorage.getItem('token') || null
+        role: null
     }),
     actions: {
         async login(username, password) {
@@ -14,17 +13,13 @@ export const useAuthStore = defineStore('auth', {
                 body: JSON.stringify({ username, password })
             })
             if (!res.ok) throw new Error('Credenciales inválidas')
-            const data = await res.json()
-            this.token = data.token
-            this.user = data.username
-            this.role = data.role
-            localStorage.setItem('token', data.token)
+            // Si el backend devuelve el rol, puedes extraerlo aquí
+            this.user = username
+            // this.role = (await res.json()).role
         },
         logout() {
             this.user = null
             this.role = null
-            this.token = null
-            localStorage.removeItem('token')
         }
     }
 })

@@ -56,9 +56,5 @@ INSERT INTO reserva (fecha_inicio, fecha_fin, cliente_id, habitacion_id, hotel_i
 
 -- Usuarios
 INSERT INTO usuario (id, username, password, role, activo) VALUES
-  (1, 'admin', '$2a$10$i.NwHvQQGMjFfwnhexDKOezRNPBpGhD0cH5Fv6MoNwKd80Xse0emK', 'ADMIN', true),
-  (2, 'usuario', '$2a$10$2Ecnem8zwCJKEYh5hkBES.sB7WXPJpYJR9d3.oXd2ra0BtyRihGr6', 'USER', true);
-
--- Refresh tokens (ejemplo, puedes dejar vacío si se generan en runtime)
--- INSERT INTO refresh_token (token, usuario_id, expiry_date) VALUES
---   ('token_de_ejemplo', 1, '2025-12-31 23:59:59');
+  (1, 'admin', 'admin', 'ADMIN', true),
+  (2, 'usuario', '1234', 'USER', true);

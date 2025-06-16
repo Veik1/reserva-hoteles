@@ -52,10 +52,3 @@ CREATE TABLE usuario (
     created_at TIMESTAMP,
     updated_at TIMESTAMP
 );
-
-CREATE TABLE refresh_token (
-    id BIGSERIAL PRIMARY KEY,
-    token VARCHAR(255) NOT NULL UNIQUE,
-    usuario_id BIGINT NOT NULL REFERENCES usuario(id),
-    expiry_date TIMESTAMP NOT NULL
-);

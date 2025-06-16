@@ -14,13 +14,13 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Usuario usuario = usuarioRepository.findByUsernameAndActivoTrue(username)
+        Usuario usuario = usuarioRepository.findByUsernameAndEnabledTrue(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
         return User.builder()
                 .username(usuario.getUsername())
                 .password(usuario.getPassword())
-                .roles(usuario.getRole())
-                .disabled(!usuario.isActivo())
+                .roles(usuario.getRoles() != null ? usuario.getRoles().toArray(new String[0]) : new String[0])
+                .disabled(usuario.getEnabled() != null && !usuario.getEnabled())
                 .build();
     }
 }

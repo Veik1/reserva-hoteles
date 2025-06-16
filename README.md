@@ -1,23 +1,15 @@
 # Reserva Hoteles
 
-Proyecto Java Spring Boot + Vue 3 para la gestión de reservas de hoteles.
+Proyecto de gestión de reservas de hoteles.  
+Stack: **Java 17 + Spring Boot 3 + PostgreSQL + Vue 3 + Pinia + Vite**.
 
 ---
 
-## Tecnologías
+## Tecnologías principales
 
-- Java 17
-- Spring Boot 3
-- PostgreSQL (producción)
-- H2 (tests)
-- Docker & Docker Compose
-- Flyway (migraciones)
-- Swagger/OpenAPI (documentación)
-- JUnit, Mockito (tests)
-- Spring Security (JWT y roles, refresh tokens)
-- BCrypt (hash de contraseñas)
-- Vue 3 + Vite (frontend)
-- Axios, Pinia (frontend)
+- **Backend:** Java 17, Spring Boot 3, Spring Data JPA, Spring Security (solo roles, sin JWT), Flyway, PostgreSQL, H2 (tests), JUnit 5, Mockito
+- **Frontend:** Vue 3, Vite, Pinia, Vue Router, Axios
+- **Infraestructura:** Docker, Docker Compose
 
 ---
 
@@ -30,7 +22,7 @@ Proyecto Java Spring Boot + Vue 3 para la gestión de reservas de hoteles.
 │   │   ├── java/com/hotel/         # Código fuente Java
 │   │   └── resources/
 │   │       ├── application.properties
-│   │       └── db/migration/       # Migraciones Flyway
+│   │       └── db/migration/       # Migraciones Flyway y seeds
 │   └── test/
 │       ├── java/com/hotel/         # Tests unitarios e integración
 │       └── resources/
@@ -38,9 +30,9 @@ Proyecto Java Spring Boot + Vue 3 para la gestión de reservas de hoteles.
 ├── vue-app/
 │   ├── src/
 │   │   ├── views/                  # Vistas Vue
-│   │   ├── components/             # Componentes Vue (Spinner, AlertMessage, etc)
-│   │   ├── store/                  # Pinia stores
-│   │   ├── services/               # Lógica de API (axios)
+│   │   ├── components/             # Componentes Vue
+│   │   ├── store/                  # Pinia stores (sin tokens)
+│   │   ├── services/               # Lógica de API (axios, sin tokens)
 │   │   └── assets/
 │   ├── public/
 │   ├── package.json
@@ -63,41 +55,20 @@ git clone https://github.com/Veik1/reserva-hoteles.git
 cd reserva-hoteles
 ```
 
-<<<<<<< HEAD
----
-
 ### 2. Backend: compila y prueba la app localmente
 
 ```sh
 mvn clean package
 ```
-
 Esto ejecuta todos los tests (usando H2) y genera el JAR en `target/`.
-
----
 
 ### 3. Backend: levanta la base de datos y el backend con Docker Compose
-=======
-### 2. Compila y prueba la app localmente
-
-```sh
-mvn clean package
-```
-
-Esto ejecuta todos los tests (usando H2) y genera el JAR en `target/`.
-
-### 3. Levanta la base de datos y el backend con Docker Compose
->>>>>>> 79d9fb5dbfae571d1cd14d452517f5a7cf174da0
 
 ```sh
 docker compose up --build
 ```
-
 Esto construye la imagen del backend y levanta PostgreSQL y la app.
 
----
-
-<<<<<<< HEAD
 ### 4. Frontend: instala dependencias y ejecuta
 
 ```sh
@@ -105,7 +76,6 @@ cd vue-app
 npm install
 npm run dev
 ```
-
 El frontend quedará disponible en [http://localhost:5173](http://localhost:5173) (o el puerto que indique Vite).
 
 ---
@@ -114,90 +84,37 @@ El frontend quedará disponible en [http://localhost:5173](http://localhost:5173
 
 - **Frontend:**  
   [http://localhost:5173](http://localhost:5173)
-=======
-## Acceso a la aplicación
-
->>>>>>> 79d9fb5dbfae571d1cd14d452517f5a7cf174da0
 - **API y documentación Swagger:**  
   [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
 - **Base de datos PostgreSQL:**  
   Host: `localhost`  
-  Puerto: `5432`  
+  Base: `hotel`  
   Usuario: `hoteluser`  
-  Contraseña: `hotelpass`  
-  Base: `hotel`
+  Contraseña: `hotelpass`
 
 ---
 
 ## Seguridad
 
-<<<<<<< HEAD
-- **JWT + Refresh Token**
-=======
-- **HTTP Basic Auth**
->>>>>>> 79d9fb5dbfae571d1cd14d452517f5a7cf174da0
-- **Usuario:** `usuario`
-- **Contraseña:** `1234`
-- **Usuario admin:** `admin` / `admin`
-- Los roles y accesos están definidos en [`SecurityConfig.java`](src/main/java/com/hotel/config/SecurityConfig.java)
-<<<<<<< HEAD
-- El frontend maneja automáticamente la expiración del JWT y solicita uno nuevo usando el refresh token.
+- **NO se usa JWT ni refresh tokens.**
+- **NO se usa bcrypt ni hash de contraseñas.**
+- Las contraseñas se almacenan y validan en texto plano (solo para fines de demo/pruebas).
+- Los roles (`ADMIN`, `USER`) se gestionan en la entidad `Usuario`.
+- El backend permite autenticación simple por usuario/contraseña.
+- Los tests y seeds usan usuarios en texto plano.
+- El frontend no maneja tokens ni lógica de refresco.
+
+### Usuarios por defecto (seeds y tests)
+
+- **Usuario:** `usuario` / `1234`
+- **Admin:** `admin` / `admin`
 
 ---
 
-## UX y Accesibilidad
+## Migraciones y Seeds
 
-- **Loaders (spinners)** y **mensajes claros** en todas las vistas.
-- **Mensajes de error y éxito** visibles y accesibles.
-- **Diseño responsive** y colores fríos.
-- **Navegación rápida** y accesible desde la Home.
-
----
-
-## Ejemplos de uso de la API (con JWT)
-
-### 1. Obtener token JWT
-
-```sh
-curl -X POST http://localhost:8080/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"username":"usuario","password":"1234"}'
-```
-
-La respuesta será:
-```json
-{
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "refreshToken": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
-  "username": "usuario",
-  "role": "USER"
-}
-```
-
-### 2. Usar el token JWT en los endpoints
-
-Guarda el valor de `token` y úsalo así:
-
-```sh
-curl -X GET http://localhost:8080/api/clientes \
-  -H "Authorization: Bearer TU_TOKEN_AQUI"
-```
-
-### 3. Refrescar el token JWT
-
-```sh
-curl -X POST http://localhost:8080/api/auth/refresh \
-  -H "Content-Type: application/json" \
-  -d '{"refreshToken":"xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"}'
-```
-
-### 4. Probar la API en Swagger
-
-- Ve a [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
-- Haz clic en "Authorize" e ingresa:  
-  `Bearer TU_TOKEN_AQUI`
-=======
->>>>>>> 79d9fb5dbfae571d1cd14d452517f5a7cf174da0
+- Las migraciones Flyway (`src/main/resources/db/migration/`) crean el esquema y cargan datos iniciales (usuarios, hoteles, etc).
+- Los tests usan H2 en memoria y datos de prueba.
 
 ---
 
@@ -211,71 +128,60 @@ mvn clean test
 
 ---
 
-## Migraciones y Seeds
+## Endpoints principales
 
-- Las migraciones Flyway (`src/main/resources/db/migration/`) crean el esquema y cargan datos iniciales (seeds).
-- Los tests usan datos aleatorios y nunca chocan con los seeds.
+- `/api/auth/login` — Login simple (usuario/contraseña en texto plano)
+- `/api/hoteles` — CRUD de hoteles
+- `/api/habitaciones` — CRUD de habitaciones
+- `/api/clientes` — CRUD de clientes
+- `/api/reservas` — CRUD de reservas
 
----
-
-## Notas
-
-- El backend usa PostgreSQL en producción y H2 en memoria para pruebas.
-- Las migraciones Flyway crean y llenan la base de datos automáticamente.
-<<<<<<< HEAD
-- Seguridad JWT (usuario: `usuario`, contraseña: `1234`).
-- Puedes explorar y probar la API desde Swagger UI.
-- Los tests de integración usan datos aleatorios y nunca chocan con los seeds.
-- El frontend maneja automáticamente la expiración de sesión y muestra mensajes claros al usuario.
+Consulta la documentación Swagger en [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
 
 ---
 
-## Paso a paso para preparar y probar todo
+## Frontend
 
-### 1. Clonar el repositorio
+- Vue 3 + Vite + Pinia + Vue Router + Axios
+- No hay lógica de tokens ni refresh en el store ni en los servicios.
+- UX: loaders, mensajes claros, diseño responsive.
 
-```sh
-git clone https://github.com/Veik1/reserva-hoteles.git
-cd reserva-hoteles
-```
-
-### 2. Compilar y probar el backend
+### Scripts útiles
 
 ```sh
-mvn clean package
+npm run dev      # Levanta el frontend en modo desarrollo
+npm run build    # Compila para producción
+npm run lint     # Lint con ESLint
+npm run format   # Formatea el código con Prettier
 ```
 
-### 3. Levantar backend y base de datos con Docker
+---
 
-```sh
-docker compose up --build
-```
+## Docker
 
-- Esto deja el backend en [http://localhost:8080](http://localhost:8080)
+- Levanta backend y base de datos con:
+  ```sh
+  docker compose up --build
+  ```
+- El backend queda en [http://localhost:8080](http://localhost:8080)
 - La base de datos PostgreSQL queda en el puerto 5432
 
-### 4. Instalar y ejecutar el frontend
+---
 
-```sh
-cd vue-app
-npm install
-npm run dev
-```
+## Notas importantes
 
-- El frontend queda en [http://localhost:5173](http://localhost:5173)
-
-### 5. Probar la aplicación
-
-- Ingresa a [http://localhost:5173](http://localhost:5173)
-- Inicia sesión con `usuario` / `1234` o `admin` / `admin`
-- Prueba las vistas, la administración y la experiencia de usuario
-- Si quieres probar la API directamente, usa Swagger en [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+- **Este proyecto es solo para fines de aprendizaje/demostración.**  
+  No uses autenticación en texto plano en producción.
+- El backend y frontend están desacoplados y se comunican vía API REST.
+- El frontend no almacena ni maneja tokens.
+- El backend no expone endpoints de refresh ni de gestión de tokens.
 
 ---
-=======
-- Seguridad básica HTTP Basic (usuario: `usuario`, contraseña: `1234`).
-- Puedes explorar y probar la API desde Swagger UI.
-- Los tests de integración usan datos aleatorios y nunca chocan con los seeds.
+
+## Créditos
+
+Desarrollado por [Tu Nombre o Equipo].
 
 ---
->>>>>>> 79d9fb5dbfae571d1cd14d452517f5a7cf174da0
+
+¿Dudas o sugerencias? ¡Abre un issue o contacta!

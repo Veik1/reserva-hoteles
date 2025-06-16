@@ -10,6 +10,9 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.*;
 
+import java.util.Map;
+import java.util.Set;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -26,53 +29,38 @@ class SecurityIntegrationTest {
 
         @BeforeEach
         void ensureAdminExists() {
-                String adminHash = "$2a$10$i.NwHvQQGMjFfwnhexDKOezRNPBpGhD0cH5Fv6MoNwKd80Xse0emK";
-                usuarioRepository.findByUsername("admin").orElseGet(() -> {
-                        Usuario admin = new Usuario();
+                Usuario admin = usuarioRepository.findByUsername("admin");
+                if (admin == null) {
+                        admin = new Usuario();
                         admin.setUsername("admin");
-                        admin.setPassword(adminHash);
-                        admin.setRole("ADMIN");
-                        admin.setActivo(true);
-                        return usuarioRepository.save(admin);
-                });
+                        admin.setPassword("admin");
+                        admin.setRoles(Set.of("ADMIN"));
+                        admin.setEnabled(true);
+                        usuarioRepository.save(admin);
+                }
         }
 
         private String url(String path) {
                 return "http://localhost:" + port + (path.startsWith("/") ? path : "/" + path);
         }
 
-        protected String obtenerToken(String username, String password) {
+        @Test
+        void adminPuedeAutenticarse() {
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.APPLICATION_JSON);
-                String body = String.format("{\"username\":\"%s\",\"password\":\"%s\"}", username, password);
+                String body = "{\"username\":\"admin\",\"password\":\"admin\"}";
                 HttpEntity<String> request = new HttpEntity<>(body, headers);
 
-                ResponseEntity<java.util.Map<String, Object>> response = restTemplate.exchange(
+                ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
                                 url("/api/auth/login"),
                                 HttpMethod.POST,
                                 request,
-                                new org.springframework.core.ParameterizedTypeReference<java.util.Map<String, Object>>() {
+                                new org.springframework.core.ParameterizedTypeReference<Map<String, Object>>() {
                                 });
+
                 assertEquals(HttpStatus.OK, response.getStatusCode());
-                assertNotNull(response.getBody(), "Response body is null");
-                java.util.Map<String, Object> bodyMap = response.getBody();
-                assertNotNull(bodyMap, "Response body is null");
-                Object tokenObj = bodyMap.get("token");
-                assertNotNull(tokenObj, "Token is null in response body");
-                return (String) tokenObj;
-        }
-
-        protected HttpHeaders authHeaders(String token) {
-                HttpHeaders headers = new HttpHeaders();
-                headers.setBearerAuth(token);
-                return headers;
-        }
-
-        // Ejemplo de test usando admin
-        @Test
-        void adminPuedeAutenticarse() {
-                String token = obtenerToken("admin", "admin");
-                assertNotNull(token);
-                assertFalse(token.isEmpty());
+                Map<String, Object> responseBody = response.getBody();
+                assertNotNull(responseBody, "Response body is null");
+                assertEquals("Login exitoso", responseBody.get("message"));
         }
 }

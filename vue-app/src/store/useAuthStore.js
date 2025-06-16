@@ -3,43 +3,23 @@ import api from '../services/api'
 
 export const useAuthStore = defineStore('auth', {
     state: () => ({
-        token: localStorage.getItem('token') || null,
-        refreshToken: localStorage.getItem('refreshToken') || null,
         user: null,
         role: null
     }),
     actions: {
-        setToken(token) {
-            this.token = token
-            localStorage.setItem('token', token)
-        },
-        setRefreshToken(refreshToken) {
-            this.refreshToken = refreshToken
-            localStorage.setItem('refreshToken', refreshToken)
-        },
-        async logout() {
-            if (this.refreshToken) {
-                try {
-                    await api.post('/auth/logout', { refreshToken: this.refreshToken })
-                } catch (e) { }
+        async login(username, password) {
+            const res = await api.post('/auth/login', { username, password })
+            if (res.data && res.data.message === 'Login exitoso') {
+                this.user = username
+                // Si el backend devuelve el rol, asígnalo aquí:
+                // this.role = res.data.role
+            } else {
+                throw new Error('Credenciales inválidas')
             }
-            this.token = null
-            this.refreshToken = null
+        },
+        logout() {
             this.user = null
             this.role = null
-            localStorage.clear()
-        },
-        async revokeAll() {
-            if (this.user) {
-                try {
-                    await api.post('/auth/revoke-all', { username: this.user })
-                } catch (e) { }
-            }
-            this.token = null
-            this.refreshToken = null
-            this.user = null
-            this.role = null
-            localStorage.clear()
         }
     }
 })
