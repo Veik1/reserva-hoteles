@@ -50,26 +50,46 @@ git clone https://github.com/Veik1/reserva-hoteles.git
 cd reserva-hoteles
 ```
 
-2. **Levanta los servicios con Docker Compose:**
-   ```sh
-   docker-compose up --build
-   ```
-<<<<<<< HEAD
-4. Accede a la API en [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)
-=======
+### 2. Compila y prueba la app localmente
 
-3. **Accede a la API y documentación:**
-   - [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+```sh
+mvn clean package
+```
 
-## Estructura del proyecto
+Esto ejecuta todos los tests (usando H2) y genera el JAR en `target/`.
 
-- `src/main/java/com/hotel/` - Código fuente Java
-- `src/main/resources/` - Configuración, migraciones y recursos
-- `src/test/java/com/hotel/` - Pruebas unitarias e integración
-- `src/test/resources/` - Configuración para tests (H2)
-- `docker-compose.yml` - Orquestación de contenedores
-- `Dockerfile` - Imagen del backend
-- `README.md` - Documentación
+### 3. Levanta la base de datos y el backend con Docker Compose
+
+```sh
+docker compose up --build
+```
+
+Esto construye la imagen del backend y levanta PostgreSQL y la app.
+
+---
+
+## Acceso a la aplicación
+
+- **API y documentación Swagger:**  
+  [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+- **Base de datos PostgreSQL:**  
+  Host: `localhost`  
+  Puerto: `5432`  
+  Usuario: `hoteluser`  
+  Contraseña: `hotelpass`  
+  Base: `hotel`
+
+---
+
+## Seguridad
+
+- **HTTP Basic Auth**
+- **Usuario:** `usuario`
+- **Contraseña:** `1234`
+- **Usuario admin:** `admin` / `admin`
+- Los roles y accesos están definidos en [`SecurityConfig.java`](src/main/java/com/hotel/config/SecurityConfig.java)
+
+---
 
 ## Pruebas
 
@@ -144,8 +164,7 @@ curl -X GET http://localhost:8080/api/reservas -u usuario:1234
 - El backend usa PostgreSQL en producción y H2 en memoria para pruebas.
 - Las migraciones Flyway crean y llenan la base de datos automáticamente.
 - Seguridad básica HTTP Basic (usuario: `usuario`, contraseña: `1234`).
-<<<<<<< HEAD
->>>>>>> 1e113fe (backend major update)
-=======
-- Puedes explorar y probar la API desde
->>>>>>> d94a14e (Backend major update)
+- Puedes explorar y probar la API desde Swagger UI.
+- Los tests de integración usan datos aleatorios y nunca chocan con los seeds.
+
+---
