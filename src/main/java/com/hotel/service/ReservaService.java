@@ -26,21 +26,23 @@ public class ReservaService {
         return reservaRepository.findById(id);
     }
 
-    public boolean cancelarReserva(Long id) {
-        if (reservaRepository.existsById(id)) {
+    public Reserva actualizarReserva(Long id, Reserva reserva) {
+        return reservaRepository.findById(id)
+                .map(r -> {
+                    r.setFechaInicio(reserva.getFechaInicio());
+                    r.setFechaFin(reserva.getFechaFin());
+                    r.setCliente(reserva.getCliente());
+                    r.setHabitacion(reserva.getHabitacion());
+                    return reservaRepository.save(r);
+                })
+                .orElse(null);
+    }
+
+    public boolean eliminarReserva(Long id) {
+        if (reservaRepository.findById(id).isPresent()) {
             reservaRepository.deleteById(id);
             return true;
         }
         return false;
-    }
-
-    public Reserva actualizarReserva(Long id, Reserva reservaActualizada) {
-        return reservaRepository.findById(id).map(reserva -> {
-            reserva.setCliente(reservaActualizada.getCliente());
-            reserva.setHabitacion(reservaActualizada.getHabitacion());
-            reserva.setFechaInicio(reservaActualizada.getFechaInicio());
-            reserva.setFechaFin(reservaActualizada.getFechaFin());
-            return reservaRepository.save(reserva);
-        }).orElse(null);
     }
 }

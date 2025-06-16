@@ -26,20 +26,22 @@ public class ClienteService {
         return clienteRepository.findById(id);
     }
 
+    public Cliente actualizarCliente(Long id, Cliente cliente) {
+        return clienteRepository.findById(id)
+                .map(c -> {
+                    c.setNombre(cliente.getNombre());
+                    c.setEmail(cliente.getEmail());
+                    c.setDni(cliente.getDni());
+                    return clienteRepository.save(c);
+                })
+                .orElse(null);
+    }
+
     public boolean eliminarCliente(Long id) {
-        if (clienteRepository.existsById(id)) {
+        if (clienteRepository.findById(id).isPresent()) {
             clienteRepository.deleteById(id);
             return true;
         }
         return false;
-    }
-
-    public Cliente actualizarCliente(Long id, Cliente clienteActualizado) {
-        return clienteRepository.findById(id).map(cliente -> {
-            cliente.setNombre(clienteActualizado.getNombre());
-            cliente.setEmail(clienteActualizado.getEmail());
-            cliente.setDni(clienteActualizado.getDni());
-            return clienteRepository.save(cliente);
-        }).orElse(null);
     }
 }

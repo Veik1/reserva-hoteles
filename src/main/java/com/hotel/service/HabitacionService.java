@@ -26,21 +26,23 @@ public class HabitacionService {
         return habitacionRepository.findById(id);
     }
 
+    public Habitacion actualizarHabitacion(Long id, Habitacion habitacion) {
+        return habitacionRepository.findById(id)
+                .map(h -> {
+                    h.setNumero(habitacion.getNumero());
+                    h.setTipo(habitacion.getTipo());
+                    h.setDisponible(habitacion.isDisponible());
+                    h.setPrecio(habitacion.getPrecio());
+                    return habitacionRepository.save(h);
+                })
+                .orElse(null);
+    }
+
     public boolean eliminarHabitacion(Long id) {
-        if (habitacionRepository.existsById(id)) {
+        if (habitacionRepository.findById(id).isPresent()) {
             habitacionRepository.deleteById(id);
             return true;
         }
         return false;
-    }
-
-    public Habitacion actualizarHabitacion(Long id, Habitacion habitacionActualizada) {
-        return habitacionRepository.findById(id).map(habitacion -> {
-            habitacion.setNumero(habitacionActualizada.getNumero());
-            habitacion.setTipo(habitacionActualizada.getTipo());
-            habitacion.setDisponible(habitacionActualizada.isDisponible());
-            habitacion.setPrecio(habitacionActualizada.getPrecio());
-            return habitacionRepository.save(habitacion);
-        }).orElse(null);
     }
 }
