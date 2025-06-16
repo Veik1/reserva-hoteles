@@ -50,9 +50,68 @@ Para ejecutar los tests (usa H2 en memoria):
 ./mvnw clean test
 ```
 
+## Seguridad
+
+- HTTP Basic Auth
+- Usuario: `usuario`
+- Contraseña: `1234`
+
+## Ejemplos de uso de la API
+
+> Todos los endpoints requieren autenticación básica.
+
+### Crear un cliente
+
+```sh
+curl -X POST http://localhost:8080/api/clientes \
+  -u usuario:1234 \
+  -H "Content-Type: application/json" \
+  -d '{"nombre":"Juan Perez","email":"juan@mail.com","dni":"12345678"}'
+```
+
+### Listar clientes
+
+```sh
+curl -X GET http://localhost:8080/api/clientes -u usuario:1234
+```
+
+### Crear una habitación
+
+```sh
+curl -X POST http://localhost:8080/api/habitaciones \
+  -u usuario:1234 \
+  -H "Content-Type: application/json" \
+  -d '{"numero":101,"tipo":"Suite","disponible":true,"precio":2000.0}'
+```
+
+### Listar habitaciones
+
+```sh
+curl -X GET http://localhost:8080/api/habitaciones -u usuario:1234
+```
+
+### Crear una reserva
+
+```sh
+curl -X POST http://localhost:8080/api/reservas \
+  -u usuario:1234 \
+  -H "Content-Type: application/json" \
+  -d '{"clienteId":1,"habitacionId":1,"fechaInicio":"2025-06-20","fechaFin":"2025-06-22"}'
+```
+
+### Listar reservas
+
+```sh
+curl -X GET http://localhost:8080/api/reservas -u usuario:1234
+```
+
 ## Notas
 
 - El backend usa PostgreSQL en producción y H2 en memoria para pruebas.
 - Las migraciones Flyway crean y llenan la base de datos automáticamente.
 - Seguridad básica HTTP Basic (usuario: `usuario`, contraseña: `1234`).
+<<<<<<< HEAD
 >>>>>>> 1e113fe (backend major update)
+=======
+- Puedes explorar y probar la API desde
+>>>>>>> d94a14e (Backend major update)
