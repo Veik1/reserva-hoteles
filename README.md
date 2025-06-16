@@ -177,11 +177,3 @@ npm run format   # Formatea el código con Prettier
 - El backend no expone endpoints de refresh ni de gestión de tokens.
 
 ---
-
-## Créditos
-
-Desarrollado por [Tu Nombre o Equipo].
-
----
-
-¿Dudas o sugerencias? ¡Abre un issue o contacta!
