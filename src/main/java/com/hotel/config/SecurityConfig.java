@@ -1,5 +1,6 @@
 package com.hotel.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -17,29 +18,46 @@ import java.util.List;
 @Configuration
 public class SecurityConfig {
 
+        @Value("${spring.profiles.active:}")
+        private String activeProfile;
+
         @Bean
         public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
                 http
                                 .csrf(csrf -> csrf.disable())
                                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                                 .authorizeHttpRequests(auth -> auth
-                                                .requestMatchers(
-                                                                "/swagger-ui.html",
-                                                                "/swagger-ui/**",
+                                                // Swagger solo en dev
+                                                .requestMatchers("/swagger-ui.html", "/swagger-ui/**",
                                                                 "/v3/api-docs/**")
                                                 .permitAll()
+                                                // Endpoints públicos (ajusta según tu app)
+                                                .requestMatchers("/public/**").permitAll()
+                                                // Endpoints protegidos
+                                                .requestMatchers("/api/hoteles/**").hasAnyRole("ADMIN", "USER")
+                                                .requestMatchers("/api/habitaciones/**").hasRole("ADMIN")
+                                                .requestMatchers("/api/reservas/**").hasAnyRole("ADMIN", "USER")
                                                 .anyRequest().authenticated())
-                                .httpBasic(org.springframework.security.config.Customizer.withDefaults());
+                                .httpBasic(org.springframework.security.config.Customizer.withDefaults())
+                // Opcional: habilita login form
+                // .formLogin(form -> form.permitAll())
+                ;
+
+                // Permite frames solo en dev para H2-console
+                if ("dev".equals(activeProfile)) {
+                        http.headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()));
+                }
+
                 return http.build();
         }
 
         @Bean
         public CorsConfigurationSource corsConfigurationSource() {
                 CorsConfiguration configuration = new CorsConfiguration();
-                configuration.setAllowedOrigins(List.of("*")); // Permite todos los orígenes (ajusta en producción)
+                configuration.setAllowedOrigins(List.of("*"));
                 configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                 configuration.setAllowedHeaders(List.of("*"));
-                configuration.setAllowCredentials(false); // Cambia a true si usas cookies/autenticación de sesión
+                configuration.setAllowCredentials(false);
 
                 UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
                 source.registerCorsConfiguration("/**", configuration);

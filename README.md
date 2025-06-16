@@ -2,29 +2,61 @@
 
 Proyecto Java Spring Boot para la gestión de reservas de hoteles.
 
+---
+
 ## Tecnologías
 
 - Java 17
 - Spring Boot 3
 - PostgreSQL (producción)
 - H2 (tests)
-- Docker Compose
+- Docker & Docker Compose
 - Flyway (migraciones)
 - Swagger/OpenAPI (documentación)
 - JUnit, Mockito (tests)
+- Spring Security (HTTP Basic Auth)
 
-## Uso rápido
+---
 
-1. **Clona el repositorio:**
-   ```sh
-   git clone https://github.com/Veik1/reserva-hoteles.git
-   cd reserva-hoteles
-   ```
+## Estructura del proyecto
+
+```
+.
+├── src/
+│   ├── main/
+│   │   ├── java/com/hotel/         # Código fuente Java
+│   │   └── resources/
+│   │       ├── application.properties
+│   │       └── db/migration/       # Migraciones Flyway
+│   └── test/
+│       ├── java/com/hotel/         # Tests unitarios e integración
+│       └── resources/
+│           └── application.properties
+├── Dockerfile                      # Imagen backend
+├── docker-compose.yml              # Orquestación de contenedores
+├── pom.xml                         # Dependencias Maven
+├── README.md                       # Este archivo
+└── logs/                           # Logs de la aplicación
+```
+
+---
+
+## Configuración rápida
+
+### 1. Clona el repositorio
+
+```sh
+git clone https://github.com/Veik1/reserva-hoteles.git
+cd reserva-hoteles
+```
 
 2. **Levanta los servicios con Docker Compose:**
    ```sh
    docker-compose up --build
    ```
+<<<<<<< HEAD
+4. Accede a la API en [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)
+=======
 
 3. **Accede a la API y documentación:**
    - [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
@@ -44,14 +76,17 @@ Proyecto Java Spring Boot para la gestión de reservas de hoteles.
 Para ejecutar los tests (usa H2 en memoria):
 
 ```sh
-./mvnw clean test
+mvn clean test
 ```
 
-## Seguridad
+---
 
-- HTTP Basic Auth
-- Usuario: `usuario`
-- Contraseña: `1234`
+## Migraciones y Seeds
+
+- Las migraciones Flyway (`src/main/resources/db/migration/`) crean el esquema y cargan datos iniciales (seeds) con IDs altos para evitar conflictos en tests.
+- Los tests usan datos aleatorios y nunca chocan con los seeds.
+
+---
 
 ## Ejemplos de uso de la API
 
@@ -72,13 +107,13 @@ curl -X POST http://localhost:8080/api/clientes \
 curl -X GET http://localhost:8080/api/clientes -u usuario:1234
 ```
 
-### Crear una habitación
+### Crear una habitación (requiere rol ADMIN)
 
 ```sh
 curl -X POST http://localhost:8080/api/habitaciones \
-  -u usuario:1234 \
+  -u admin:admin \
   -H "Content-Type: application/json" \
-  -d '{"numero":101,"tipo":"Suite","disponible":true,"precio":2000.0}'
+  -d '{"numero":101,"tipo":"Suite","disponible":true,"precio":2000.0,"hotel":{"id":1001}}'
 ```
 
 ### Listar habitaciones
@@ -93,7 +128,7 @@ curl -X GET http://localhost:8080/api/habitaciones -u usuario:1234
 curl -X POST http://localhost:8080/api/reservas \
   -u usuario:1234 \
   -H "Content-Type: application/json" \
-  -d '{"clienteId":1,"habitacionId":1,"fechaInicio":"2025-06-20","fechaFin":"2025-06-22"}'
+  -d '{"cliente":{"id":3001},"habitacion":{"id":2001},"hotel":{"id":1001},"fechaInicio":"2025-06-20","fechaFin":"2025-06-22"}'
 ```
 
 ### Listar reservas
@@ -102,9 +137,15 @@ curl -X POST http://localhost:8080/api/reservas \
 curl -X GET http://localhost:8080/api/reservas -u usuario:1234
 ```
 
+---
+
 ## Notas
 
 - El backend usa PostgreSQL en producción y H2 en memoria para pruebas.
 - Las migraciones Flyway crean y llenan la base de datos automáticamente.
 - Seguridad básica HTTP Basic (usuario: `usuario`, contraseña: `1234`).
-- Puedes explorar y probar la API desde Swagger UI.
+<<<<<<< HEAD
+>>>>>>> 1e113fe (backend major update)
+=======
+- Puedes explorar y probar la API desde
+>>>>>>> d94a14e (Backend major update)

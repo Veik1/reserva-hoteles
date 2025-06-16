@@ -1,55 +1,119 @@
 package com.hotel.controller;
 
 import com.hotel.model.Reserva;
+import com.hotel.model.Cliente;
+import com.hotel.model.Habitacion;
+import com.hotel.model.Hotel;
 import com.hotel.service.ReservaService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import com.hotel.service.ClienteService;
+import com.hotel.service.HabitacionService;
+import com.hotel.service.HotelService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
-@RequestMapping("/reservas")
-@Tag(name = "Reservas", description = "Operaciones CRUD para reservas")
+@RequestMapping("/api/reservas")
 public class ReservaController {
 
     @Autowired
     private ReservaService reservaService;
+    @Autowired
+    private ClienteService clienteService;
+    @Autowired
+    private HabitacionService habitacionService;
+    @Autowired
+    private HotelService hotelService;
 
-    @Operation(summary = "Obtener todas las reservas")
+    // No paginado
     @GetMapping
-    public List<Reserva> getAllReservas() {
+    public List<Reserva> listarReservas() {
         return reservaService.obtenerTodas();
     }
 
-    @Operation(summary = "Obtener una reserva por ID")
+    @GetMapping("/hotel/{hotelId}")
+    public List<Reserva> listarPorHotel(@PathVariable Long hotelId) {
+        return reservaService.obtenerPorHotel(hotelId);
+    }
+
+    // Paginado
+    @GetMapping("/paginado")
+    public Page<Reserva> listarReservasPaginado(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return reservaService.obtenerTodasPaginado(page, size);
+    }
+
+    @GetMapping("/hotel/{hotelId}/paginado")
+    public Page<Reserva> listarPorHotelPaginado(
+            @PathVariable Long hotelId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return reservaService.obtenerPorHotelPaginado(hotelId, page, size);
+    }
+
     @GetMapping("/{id}")
-    public ResponseEntity<Reserva> getReservaById(@PathVariable Long id) {
-        Optional<Reserva> reserva = reservaService.obtenerPorId(id);
-        return reserva.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<Reserva> obtenerReserva(@PathVariable Long id) {
+        return reservaService.obtenerPorId(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
-    @Operation(summary = "Crear una nueva reserva")
     @PostMapping
-    public Reserva createReserva(@Valid @RequestBody Reserva reserva) {
-        return reservaService.crearReserva(reserva);
+    public ResponseEntity<?> crearReserva(@RequestBody Reserva reservaRequest) {
+        if (reservaRequest.getCliente() == null || reservaRequest.getCliente().getId() == null ||
+                reservaRequest.getHabitacion() == null || reservaRequest.getHabitacion().getId() == null ||
+                reservaRequest.getHotel() == null || reservaRequest.getHotel().getId() == null) {
+            return ResponseEntity.badRequest().body("Debe especificar cliente, habitación y hotel.");
+        }
+        Cliente cliente = clienteService.obtenerPorId(reservaRequest.getCliente().getId()).orElse(null);
+        Habitacion habitacion = habitacionService.obtenerPorId(reservaRequest.getHabitacion().getId()).orElse(null);
+        Hotel hotel = hotelService.obtenerPorId(reservaRequest.getHotel().getId()).orElse(null);
+
+        if (cliente == null || habitacion == null || hotel == null) {
+            return ResponseEntity.badRequest().body("Cliente, habitación o hotel no encontrados.");
+        }
+        reservaRequest.setCliente(cliente);
+        reservaRequest.setHabitacion(habitacion);
+        reservaRequest.setHotel(hotel);
+
+        Reserva guardada = reservaService.crearReserva(reservaRequest);
+        return new ResponseEntity<>(guardada, HttpStatus.CREATED);
     }
 
-    @Operation(summary = "Actualizar una reserva existente")
     @PutMapping("/{id}")
-    public ResponseEntity<Reserva> updateReserva(@PathVariable Long id, @Valid @RequestBody Reserva reserva) {
-        Reserva updated = reservaService.actualizarReserva(id, reserva);
-        return updated != null ? ResponseEntity.ok(updated) : ResponseEntity.notFound().build();
+    public ResponseEntity<?> actualizarReserva(@PathVariable Long id, @RequestBody Reserva reservaRequest) {
+        if (reservaRequest.getCliente() == null || reservaRequest.getCliente().getId() == null ||
+                reservaRequest.getHabitacion() == null || reservaRequest.getHabitacion().getId() == null ||
+                reservaRequest.getHotel() == null || reservaRequest.getHotel().getId() == null) {
+            return ResponseEntity.badRequest().body("Debe especificar cliente, habitación y hotel.");
+        }
+        Cliente cliente = clienteService.obtenerPorId(reservaRequest.getCliente().getId()).orElse(null);
+        Habitacion habitacion = habitacionService.obtenerPorId(reservaRequest.getHabitacion().getId()).orElse(null);
+        Hotel hotel = hotelService.obtenerPorId(reservaRequest.getHotel().getId()).orElse(null);
+
+        if (cliente == null || habitacion == null || hotel == null) {
+            return ResponseEntity.badRequest().body("Cliente, habitación o hotel no encontrados.");
+        }
+        reservaRequest.setCliente(cliente);
+        reservaRequest.setHabitacion(habitacion);
+        reservaRequest.setHotel(hotel);
+
+        Reserva actualizada = reservaService.actualizarReserva(id, reservaRequest);
+        if (actualizada != null) {
+            return ResponseEntity.ok(actualizada);
+        }
+        return ResponseEntity.notFound().build();
     }
 
-    @Operation(summary = "Eliminar una reserva")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteReserva(@PathVariable Long id) {
-        return reservaService.eliminarReserva(id) ? ResponseEntity.noContent().build()
-                : ResponseEntity.notFound().build();
+    public ResponseEntity<Void> eliminarReserva(@PathVariable Long id) {
+        if (reservaService.eliminarReserva(id)) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
     }
 }

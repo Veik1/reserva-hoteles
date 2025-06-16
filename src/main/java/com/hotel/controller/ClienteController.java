@@ -2,54 +2,60 @@ package com.hotel.controller;
 
 import com.hotel.model.Cliente;
 import com.hotel.service.ClienteService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
-
-import jakarta.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
-@RequestMapping("/clientes")
-@Tag(name = "Clientes", description = "Operaciones CRUD para clientes")
+@RequestMapping("/api/clientes")
 public class ClienteController {
 
     @Autowired
     private ClienteService clienteService;
 
-    @Operation(summary = "Obtener todos los clientes")
+    // No paginado
     @GetMapping
-    public List<Cliente> getAllClientes() {
+    public List<Cliente> listarClientes() {
         return clienteService.obtenerTodos();
     }
 
-    @Operation(summary = "Obtener un cliente por ID")
+    // Paginado
+    @GetMapping("/paginado")
+    public Page<Cliente> listarClientesPaginado(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return clienteService.obtenerTodosPaginado(page, size);
+    }
+
     @GetMapping("/{id}")
-    public ResponseEntity<Cliente> getClienteById(@PathVariable Long id) {
-        Optional<Cliente> cliente = clienteService.obtenerPorId(id);
-        return cliente.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<Cliente> obtenerCliente(@PathVariable Long id) {
+        return clienteService.obtenerPorId(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
-    @Operation(summary = "Crear un nuevo cliente")
     @PostMapping
-    public Cliente createCliente(@Valid @RequestBody Cliente cliente) {
-        return clienteService.crearCliente(cliente);
+    public ResponseEntity<Cliente> crearCliente(@RequestBody Cliente clienteRequest) {
+        Cliente guardado = clienteService.crearCliente(clienteRequest);
+        return new ResponseEntity<>(guardado, HttpStatus.CREATED);
     }
 
-    @Operation(summary = "Actualizar un cliente existente")
     @PutMapping("/{id}")
-    public ResponseEntity<Cliente> updateCliente(@PathVariable Long id, @Valid @RequestBody Cliente cliente) {
-        Cliente updated = clienteService.actualizarCliente(id, cliente);
-        return updated != null ? ResponseEntity.ok(updated) : ResponseEntity.notFound().build();
+    public ResponseEntity<Cliente> actualizarCliente(@PathVariable Long id, @RequestBody Cliente clienteRequest) {
+        Cliente actualizado = clienteService.actualizarCliente(id, clienteRequest);
+        if (actualizado != null) {
+            return ResponseEntity.ok(actualizado);
+        }
+        return ResponseEntity.notFound().build();
     }
 
-    @Operation(summary = "Eliminar un cliente")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCliente(@PathVariable Long id) {
-        return clienteService.eliminarCliente(id) ? ResponseEntity.noContent().build()
-                : ResponseEntity.notFound().build();
+    public ResponseEntity<Void> eliminarCliente(@PathVariable Long id) {
+        if (clienteService.eliminarCliente(id)) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
     }
 }

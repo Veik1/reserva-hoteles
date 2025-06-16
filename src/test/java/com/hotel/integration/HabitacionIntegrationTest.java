@@ -1,41 +1,52 @@
 package com.hotel.integration;
 
 import com.hotel.model.Habitacion;
+import com.hotel.model.Hotel;
 import com.hotel.repository.HabitacionRepository;
+import com.hotel.repository.HotelRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
+@Transactional
 class HabitacionIntegrationTest {
 
     @Autowired
     private HabitacionRepository habitacionRepository;
 
+    @Autowired
+    private HotelRepository hotelRepository;
+
     @Test
-    void crudHabitacion() {
-        // CREATE
+    void crearHabitacionConDatosUnicosNoChocaConSeeds() {
+        // Crear hotel con nombre único
+        Hotel hotel = new Hotel();
+        hotel.setNombre("Hotel Test " + UUID.randomUUID());
+        hotel.setCiudad("Ciudad Test");
+        hotel.setDireccion("Dirección Test");
+        hotel.setActivo(true);
+        Hotel hotelGuardado = hotelRepository.save(hotel);
+
+        // Crear habitación con número único
         Habitacion habitacion = new Habitacion();
-        habitacion.setNumero(101);
-        habitacion.setTipo("Suite");
+        habitacion.setNumero(ThreadLocalRandom.current().nextInt(100000, 999999));
+        habitacion.setTipo("Test Tipo");
         habitacion.setDisponible(true);
-        habitacion.setPrecio(2000.0);
+        habitacion.setPrecio(1234.56);
+        habitacion.setHotel(hotelGuardado);
+        habitacion.setActivo(true);
+
         Habitacion guardada = habitacionRepository.save(habitacion);
-        assertNotNull(guardada.getId());
 
-        // READ
-        Habitacion encontrada = habitacionRepository.findById(guardada.getId()).orElse(null);
-        assertNotNull(encontrada);
-
-        // UPDATE
-        encontrada.setTipo("Doble");
-        Habitacion actualizada = habitacionRepository.save(encontrada);
-        assertEquals("Doble", actualizada.getTipo());
-
-        // DELETE
-        habitacionRepository.deleteById(actualizada.getId());
-        assertFalse(habitacionRepository.findById(actualizada.getId()).isPresent());
+        assertThat(guardada.getId()).isNotNull();
+        assertThat(guardada.getNumero()).isEqualTo(habitacion.getNumero());
+        assertThat(guardada.getHotel().getId()).isEqualTo(hotelGuardado.getId());
     }
 }

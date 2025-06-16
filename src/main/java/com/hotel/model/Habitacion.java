@@ -1,7 +1,6 @@
 package com.hotel.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
 
 @Entity
 public class Habitacion {
@@ -9,16 +8,17 @@ public class Habitacion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Min(value = 1, message = "El número debe ser mayor a 0")
     private int numero;
-
-    @NotBlank(message = "El tipo es obligatorio")
     private String tipo;
+    private Boolean disponible;
+    private Double precio;
 
-    private boolean disponible;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "hotel_id")
+    private Hotel hotel;
 
-    @Positive(message = "El precio debe ser positivo")
-    private double precio;
+    @Column(nullable = false)
+    private boolean activo = true;
 
     // Getters y setters
     public Long getId() {
@@ -45,19 +45,35 @@ public class Habitacion {
         this.tipo = tipo;
     }
 
-    public boolean isDisponible() {
+    public Boolean getDisponible() {
         return disponible;
     }
 
-    public void setDisponible(boolean disponible) {
+    public void setDisponible(Boolean disponible) {
         this.disponible = disponible;
     }
 
-    public double getPrecio() {
+    public Double getPrecio() {
         return precio;
     }
 
-    public void setPrecio(double precio) {
+    public void setPrecio(Double precio) {
         this.precio = precio;
+    }
+
+    public Hotel getHotel() {
+        return hotel;
+    }
+
+    public void setHotel(Hotel hotel) {
+        this.hotel = hotel;
+    }
+
+    public boolean isActivo() {
+        return activo;
+    }
+
+    public void setActivo(boolean activo) {
+        this.activo = activo;
     }
 }

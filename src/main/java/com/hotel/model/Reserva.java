@@ -1,42 +1,68 @@
 package com.hotel.model;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.AssertTrue;
 import java.time.LocalDate;
 
 @Entity
-@Schema(description = "Reserva de una habitación por un cliente")
 public class Reserva {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Schema(description = "ID de la reserva", example = "1")
     private Long id;
 
-    @NotNull
-    @ManyToOne
-    @Schema(description = "Cliente que realiza la reserva")
-    private Cliente cliente;
-
-    @NotNull
-    @ManyToOne
-    @Schema(description = "Habitación reservada")
-    private Habitacion habitacion;
-
-    @NotNull
-    @Schema(description = "Fecha de inicio de la reserva", example = "2024-07-01")
+    @NotNull(message = "La fecha de inicio es obligatoria")
     private LocalDate fechaInicio;
 
-    @NotNull
-    @Schema(description = "Fecha de fin de la reserva", example = "2024-07-05")
+    @NotNull(message = "La fecha de fin es obligatoria")
     private LocalDate fechaFin;
 
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "cliente_id")
+    private Cliente cliente;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "habitacion_id")
+    private Habitacion habitacion;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "hotel_id")
+    private Hotel hotel;
+
+    @Column(nullable = false)
+    private boolean activo = true;
+
+    // Validación personalizada de fechas
+    @AssertTrue(message = "La fecha de inicio debe ser anterior a la fecha de fin")
+    public boolean isFechasValidas() {
+        if (fechaInicio == null || fechaFin == null)
+            return true;
+        return fechaInicio.isBefore(fechaFin);
+    }
+
+    // Getters y setters
     public Long getId() {
         return id;
     }
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public LocalDate getFechaInicio() {
+        return fechaInicio;
+    }
+
+    public void setFechaInicio(LocalDate fechaInicio) {
+        this.fechaInicio = fechaInicio;
+    }
+
+    public LocalDate getFechaFin() {
+        return fechaFin;
+    }
+
+    public void setFechaFin(LocalDate fechaFin) {
+        this.fechaFin = fechaFin;
     }
 
     public Cliente getCliente() {
@@ -55,19 +81,19 @@ public class Reserva {
         this.habitacion = habitacion;
     }
 
-    public LocalDate getFechaInicio() {
-        return fechaInicio;
+    public Hotel getHotel() {
+        return hotel;
     }
 
-    public void setFechaInicio(LocalDate fechaInicio) {
-        this.fechaInicio = fechaInicio;
+    public void setHotel(Hotel hotel) {
+        this.hotel = hotel;
     }
 
-    public LocalDate getFechaFin() {
-        return fechaFin;
+    public boolean isActivo() {
+        return activo;
     }
 
-    public void setFechaFin(LocalDate fechaFin) {
-        this.fechaFin = fechaFin;
+    public void setActivo(boolean activo) {
+        this.activo = activo;
     }
 }

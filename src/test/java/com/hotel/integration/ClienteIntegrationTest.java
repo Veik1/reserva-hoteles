@@ -6,6 +6,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -18,9 +21,9 @@ class ClienteIntegrationTest {
     void crudCliente() {
         // CREATE
         Cliente cliente = new Cliente();
-        cliente.setNombre("Juan");
-        cliente.setEmail("juan@mail.com");
-        cliente.setDni("12345678");
+        cliente.setNombre("Juan " + UUID.randomUUID());
+        cliente.setEmail("juan" + UUID.randomUUID() + "@mail.com");
+        cliente.setDni("dni" + ThreadLocalRandom.current().nextInt(100000, 999999));
         Cliente guardado = clienteRepository.save(cliente);
         assertNotNull(guardado.getId());
 
@@ -29,9 +32,9 @@ class ClienteIntegrationTest {
         assertNotNull(encontrado);
 
         // UPDATE
-        encontrado.setNombre("Juan Actualizado");
+        encontrado.setNombre("Juan Actualizado " + UUID.randomUUID());
         Cliente actualizado = clienteRepository.save(encontrado);
-        assertEquals("Juan Actualizado", actualizado.getNombre());
+        assertTrue(actualizado.getNombre().startsWith("Juan Actualizado"));
 
         // DELETE
         clienteRepository.deleteById(actualizado.getId());

@@ -3,14 +3,14 @@ package com.hotel.model;
 import jakarta.persistence.*;
 
 @Entity
-public class Cliente {
+public class Hotel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String nombre;
-    private String email;
-    private String dni;
+    private String ciudad;
+    private String direccion;
 
     @Column(nullable = false)
     private boolean activo = true;
@@ -32,20 +32,20 @@ public class Cliente {
         this.nombre = nombre;
     }
 
-    public String getEmail() {
-        return email;
+    public String getCiudad() {
+        return ciudad;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setCiudad(String ciudad) {
+        this.ciudad = ciudad;
     }
 
-    public String getDni() {
-        return dni;
+    public String getDireccion() {
+        return direccion;
     }
 
-    public void setDni(String dni) {
-        this.dni = dni;
+    public void setDireccion(String direccion) {
+        this.direccion = direccion;
     }
 
     public boolean isActivo() {
