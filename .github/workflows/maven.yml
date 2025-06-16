@@ -11,7 +11,8 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: write  # Add this block to grant proper permissions
+      contents: write
+      security-events: write   # <-- Agrega esta línea para permitir el envío al Dependency Graph
 
     steps:
     - uses: actions/checkout@v4
