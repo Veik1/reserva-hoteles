@@ -25,9 +25,6 @@ Proyecto Java Spring Boot para la gestión de reservas de hoteles.
    ```sh
    docker-compose up --build
    ```
-<<<<<<< HEAD
-4. Accede a la API en [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)
-=======
 
 3. **Accede a la API y documentación:**
    - [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
@@ -110,8 +107,4 @@ curl -X GET http://localhost:8080/api/reservas -u usuario:1234
 - El backend usa PostgreSQL en producción y H2 en memoria para pruebas.
 - Las migraciones Flyway crean y llenan la base de datos automáticamente.
 - Seguridad básica HTTP Basic (usuario: `usuario`, contraseña: `1234`).
-<<<<<<< HEAD
->>>>>>> 1e113fe (backend major update)
-=======
-- Puedes explorar y probar la API desde
->>>>>>> d94a14e (Backend major update)
+- Puedes explorar y probar la API desde Swagger UI.
