@@ -45,6 +45,7 @@ public class HabitacionController {
         return habitacionService.obtenerPorHotelPaginado(hotelId, page, size);
     }
 
+    // GET by ID
     @GetMapping("/{id}")
     public ResponseEntity<Habitacion> obtenerHabitacion(@PathVariable Long id) {
         return habitacionService.obtenerPorId(id)

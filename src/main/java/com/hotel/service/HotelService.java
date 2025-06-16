@@ -15,18 +15,17 @@ public class HotelService {
     @Autowired
     private HotelRepository hotelRepository;
 
-    // No paginado
     public List<Hotel> obtenerTodos() {
         return hotelRepository.findByActivoTrue();
     }
 
-    // Paginado
     public Page<Hotel> obtenerTodosPaginado(int page, int size) {
         return hotelRepository.findByActivoTrue(PageRequest.of(page, size));
     }
 
     public Optional<Hotel> obtenerPorId(Long id) {
-        return hotelRepository.findById(id).filter(Hotel::isActivo);
+        return hotelRepository.findById(id)
+                .filter(h -> Boolean.TRUE.equals(h.getActivo()));
     }
 
     public Hotel crearHotel(Hotel hotel) {
@@ -36,7 +35,7 @@ public class HotelService {
 
     public Hotel actualizarHotel(Long id, Hotel hotel) {
         return hotelRepository.findById(id)
-                .filter(Hotel::isActivo)
+                .filter(h -> Boolean.TRUE.equals(h.getActivo()))
                 .map(h -> {
                     h.setNombre(hotel.getNombre());
                     h.setCiudad(hotel.getCiudad());
@@ -47,7 +46,7 @@ public class HotelService {
 
     public boolean eliminarHotel(Long id) {
         return hotelRepository.findById(id)
-                .filter(Hotel::isActivo)
+                .filter(h -> Boolean.TRUE.equals(h.getActivo()))
                 .map(h -> {
                     h.setActivo(false);
                     hotelRepository.save(h);

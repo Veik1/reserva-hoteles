@@ -1,21 +1,29 @@
 package com.hotel.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import java.time.LocalDateTime;
 
 @Entity
 public class Hotel {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "El nombre es obligatorio")
     private String nombre;
+
     private String ciudad;
     private String direccion;
 
     @Column(nullable = false)
-    private boolean activo = true;
+    private Boolean activo = true;
 
-    // Getters y setters
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
+    // getters y setters
     public Long getId() {
         return id;
     }
@@ -48,11 +56,27 @@ public class Hotel {
         this.direccion = direccion;
     }
 
-    public boolean isActivo() {
+    public Boolean getActivo() {
         return activo;
     }
 
-    public void setActivo(boolean activo) {
+    public void setActivo(Boolean activo) {
         this.activo = activo;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }

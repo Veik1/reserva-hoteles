@@ -22,12 +22,13 @@ class HotelSoftDeleteIntegrationTest {
         hotel.setNombre("SoftDelete Hotel " + UUID.randomUUID());
         hotel.setCiudad("Ciudad");
         hotel.setDireccion("Direccion");
+        hotel.setActivo(true); 
         Hotel savedHotel = hotelRepository.save(hotel);
 
         savedHotel.setActivo(false);
         hotelRepository.save(savedHotel);
 
-        assertFalse(hotelRepository.findById(savedHotel.getId()).get().isActivo());
+        assertFalse(hotelRepository.findById(savedHotel.getId()).get().getActivo());
         assertTrue(hotelRepository.findByActivoTrue().stream().noneMatch(h -> h.getId().equals(savedHotel.getId())));
     }
 }

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,6 +39,18 @@ public class ReservaService {
     }
 
     public Reserva crearReserva(Reserva reserva) {
+        if (reserva.getHabitacion() != null && reserva.getHabitacion().getId() != null &&
+                reserva.getFechaInicio() != null && reserva.getFechaFin() != null) {
+            boolean superpuesta = reservaRepository
+                    .existsByHabitacionIdAndActivoTrueAndFechaInicioLessThanAndFechaFinGreaterThan(
+                            reserva.getHabitacion().getId(),
+                            reserva.getFechaFin(),
+                            reserva.getFechaInicio());
+            if (superpuesta) {
+                throw new IllegalArgumentException(
+                        "Ya existe una reserva activa para esa habitación en las fechas seleccionadas.");
+            }
+        }
         reserva.setActivo(true);
         return reservaRepository.save(reserva);
     }

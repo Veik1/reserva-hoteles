@@ -29,6 +29,7 @@ public class ClienteController {
         return clienteService.obtenerTodosPaginado(page, size);
     }
 
+    // GET by ID
     @GetMapping("/{id}")
     public ResponseEntity<Cliente> obtenerCliente(@PathVariable Long id) {
         return clienteService.obtenerPorId(id)

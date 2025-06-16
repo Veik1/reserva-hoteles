@@ -26,6 +26,7 @@ class HotelPaginationIntegrationTest {
             hotel.setNombre("Hotel " + i + " " + UUID.randomUUID());
             hotel.setCiudad("Ciudad " + i);
             hotel.setDireccion("Direccion " + i);
+            hotel.setActivo(true); // Seteamos activo en true
             hotelRepository.save(hotel);
         }
     }

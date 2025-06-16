@@ -6,7 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/hoteles")
@@ -14,13 +18,11 @@ public class HotelController {
     @Autowired
     private HotelService hotelService;
 
-    // No paginado
     @GetMapping
     public List<Hotel> listarHoteles() {
         return hotelService.obtenerTodos();
     }
 
-    // Paginado
     @GetMapping("/paginado")
     public Page<Hotel> listarHotelesPaginado(
             @RequestParam(defaultValue = "0") int page,
@@ -36,13 +38,13 @@ public class HotelController {
     }
 
     @PostMapping
-    public ResponseEntity<Hotel> crearHotel(@RequestBody Hotel hotel) {
+    public ResponseEntity<Hotel> crearHotel(@Valid @RequestBody Hotel hotel) {
         Hotel creado = hotelService.crearHotel(hotel);
         return new ResponseEntity<>(creado, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Hotel> actualizarHotel(@PathVariable Long id, @RequestBody Hotel hotel) {
+    public ResponseEntity<Hotel> actualizarHotel(@PathVariable Long id, @Valid @RequestBody Hotel hotel) {
         Hotel actualizado = hotelService.actualizarHotel(id, hotel);
         if (actualizado != null) {
             return ResponseEntity.ok(actualizado);
@@ -56,5 +58,15 @@ public class HotelController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.notFound().build();
+    }
+
+    // Manejo de errores de validación para devolver 400 y detalles de los campos
+    // inválidos
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getFieldErrors()
+                .forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
+        return ResponseEntity.badRequest().body(errors);
     }
 }

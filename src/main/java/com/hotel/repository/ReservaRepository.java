@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface ReservaRepository extends JpaRepository<Reserva, Long> {
@@ -15,4 +16,9 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
     // Paginado
     Page<Reserva> findByActivoTrue(Pageable pageable);
     Page<Reserva> findByHotelIdAndActivoTrue(Long hotelId, Pageable pageable);
+
+    // Validación de reservas superpuestas
+    boolean existsByHabitacionIdAndActivoTrueAndFechaInicioLessThanAndFechaFinGreaterThan(
+        Long habitacionId, LocalDate fechaFin, LocalDate fechaInicio
+    );
 }

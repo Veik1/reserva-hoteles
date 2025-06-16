@@ -40,6 +40,7 @@ class ReservaHotelPaginationIntegrationTest {
         hotel.setNombre("Hotel Reserva " + UUID.randomUUID());
         hotel.setCiudad("Ciudad Reserva");
         hotel.setDireccion("Calle Reserva 456");
+        hotel.setActivo(true); // Seteamos activo en true
         hotel = hotelRepository.save(hotel);
         hotelId = hotel.getId();
 

@@ -20,6 +20,7 @@ services:
       SPRING_DATASOURCE_USERNAME: hoteluser
       SPRING_DATASOURCE_PASSWORD: hotelpass
       SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+      JWT_SECRET: randomKey123
     ports:
       - "8080:8080"
     depends_on:

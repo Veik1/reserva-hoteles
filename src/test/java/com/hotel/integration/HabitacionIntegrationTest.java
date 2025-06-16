@@ -1,52 +1,73 @@
 package com.hotel.integration;
 
-import com.hotel.model.Habitacion;
-import com.hotel.model.Hotel;
-import com.hotel.repository.HabitacionRepository;
-import com.hotel.repository.HotelRepository;
+import com.hotel.model.Usuario;
+import com.hotel.repository.UsuarioRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.*;
 
-import java.util.UUID;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
-@Transactional
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class HabitacionIntegrationTest {
 
     @Autowired
-    private HabitacionRepository habitacionRepository;
+    private TestRestTemplate restTemplate;
 
     @Autowired
-    private HotelRepository hotelRepository;
+    private UsuarioRepository usuarioRepository;
+
+    @BeforeEach
+    void ensureAdminExists() {
+        String adminHash = "$2a$10$i.NwHvQQGMjFfwnhexDKOezRNPBpGhD0cH5Fv6MoNwKd80Xse0emK";
+        usuarioRepository.findByUsername("admin").orElseGet(() -> {
+            Usuario admin = new Usuario();
+            admin.setUsername("admin");
+            admin.setPassword(adminHash);
+            admin.setRole("ADMIN");
+            admin.setActivo(true);
+            return usuarioRepository.save(admin);
+        });
+    }
+
+    private String url(String path) {
+        return path.startsWith("/") ? path : "/" + path;
+    }
+
+    @SuppressWarnings("unchecked")
+    private String obtenerToken(String username, String password) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        String body = String.format("{\"username\":\"%s\",\"password\":\"%s\"}", username, password);
+        HttpEntity<String> request = new HttpEntity<>(body, headers);
+
+        ResponseEntity<Map<String, Object>> response = restTemplate.postForEntity(url("/api/auth/login"), request,
+                (Class<Map<String, Object>>) (Class<?>) Map.class);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody(), "Response body is null");
+        Map<String, Object> responseBody = response.getBody();
+        assertNotNull(responseBody, "Response body is null");
+        return (String) responseBody.get("token");
+    }
+
+    private HttpHeaders authHeaders(String token) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+        return headers;
+    }
 
     @Test
-    void crearHabitacionConDatosUnicosNoChocaConSeeds() {
-        // Crear hotel con nombre único
-        Hotel hotel = new Hotel();
-        hotel.setNombre("Hotel Test " + UUID.randomUUID());
-        hotel.setCiudad("Ciudad Test");
-        hotel.setDireccion("Dirección Test");
-        hotel.setActivo(true);
-        Hotel hotelGuardado = hotelRepository.save(hotel);
+    void adminPuedeVerHabitaciones() {
+        String adminToken = obtenerToken("admin", "admin");
 
-        // Crear habitación con número único
-        Habitacion habitacion = new Habitacion();
-        habitacion.setNumero(ThreadLocalRandom.current().nextInt(100000, 999999));
-        habitacion.setTipo("Test Tipo");
-        habitacion.setDisponible(true);
-        habitacion.setPrecio(1234.56);
-        habitacion.setHotel(hotelGuardado);
-        habitacion.setActivo(true);
-
-        Habitacion guardada = habitacionRepository.save(habitacion);
-
-        assertThat(guardada.getId()).isNotNull();
-        assertThat(guardada.getNumero()).isEqualTo(habitacion.getNumero());
-        assertThat(guardada.getHotel().getId()).isEqualTo(hotelGuardado.getId());
+        HttpEntity<Void> adminRequest = new HttpEntity<>(authHeaders(adminToken));
+        ResponseEntity<String> responseAdmin = restTemplate.exchange(
+                url("/api/habitaciones"), HttpMethod.GET, adminRequest, String.class);
+        assertEquals(HttpStatus.OK, responseAdmin.getStatusCode());
     }
 }

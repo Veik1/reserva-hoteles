@@ -1,4 +1,4 @@
--- Hoteles (IDs altos)
+-- Hoteles
 INSERT INTO hotel (id, nombre, ciudad, direccion, activo) VALUES
   (1001, 'Seed Alvear', 'Seed Buenos Aires', 'Seed Av. Alvear 1891', true),
   (1002, 'Seed Llao Llao', 'Seed Bariloche', 'Seed Av. Bustillo Km 25', true),
@@ -6,7 +6,7 @@ INSERT INTO hotel (id, nombre, ciudad, direccion, activo) VALUES
   (1004, 'Seed Hyatt', 'Seed Mendoza', 'Seed Chile 1124', true),
   (1005, 'Seed Delos', 'Seed Tigre', 'Seed Isla Delos', true);
 
--- Habitaciones (IDs altos, referenciando hoteles seeds)
+-- Habitaciones
 INSERT INTO habitacion (id, numero, tipo, disponible, precio, hotel_id, activo) VALUES
   (2001, 101, 'Seed Suite Deluxe', true, 5000, 1001, true),
   (2002, 102, 'Seed Doble Superior', true, 3500, 1001, true),
@@ -24,7 +24,7 @@ INSERT INTO habitacion (id, numero, tipo, disponible, precio, hotel_id, activo) 
   (2014, 502, 'Seed Doble', true, 4800, 1005, true),
   (2015, 503, 'Seed Simple', true, 2700, 1005, true);
 
--- Clientes (IDs altos y emails únicos)
+-- Clientes
 INSERT INTO cliente (id, nombre, email, dni, activo) VALUES
   (3001, 'Seed Juan Perez', 'seed.juan@mail.com', '99990001', true),
   (3002, 'Seed Ana Gomez', 'seed.ana@mail.com', '99990002', true),
@@ -35,7 +35,7 @@ INSERT INTO cliente (id, nombre, email, dni, activo) VALUES
   (3007, 'Seed Sofía Romero', 'seed.sofia@mail.com', '99990007', true),
   (3008, 'Seed Martín Castro', 'seed.martin@mail.com', '99990008', true);
 
--- Reservas (referenciando los IDs seeds)
+-- Reservas
 INSERT INTO reserva (fecha_inicio, fecha_fin, cliente_id, habitacion_id, hotel_id, activo) VALUES
   ('2025-07-01', '2025-07-05', 3001, 2001, 1001, true),
   ('2025-07-03', '2025-07-07', 3002, 2002, 1001, true),
@@ -53,3 +53,12 @@ INSERT INTO reserva (fecha_inicio, fecha_fin, cliente_id, habitacion_id, hotel_i
   ('2025-11-01', '2025-11-07', 3006, 2009, 1003, true),
   ('2025-11-10', '2025-11-15', 3007, 2012, 1004, true),
   ('2025-12-01', '2025-12-10', 3008, 2015, 1005, true);
+
+-- Usuarios
+INSERT INTO usuario (id, username, password, role, activo) VALUES
+  (1, 'admin', '$2a$10$i.NwHvQQGMjFfwnhexDKOezRNPBpGhD0cH5Fv6MoNwKd80Xse0emK', 'ADMIN', true),
+  (2, 'usuario', '$2a$10$2Ecnem8zwCJKEYh5hkBES.sB7WXPJpYJR9d3.oXd2ra0BtyRihGr6', 'USER', true);
+
+-- Refresh tokens (ejemplo, puedes dejar vacío si se generan en runtime)
+-- INSERT INTO refresh_token (token, usuario_id, expiry_date) VALUES
+--   ('token_de_ejemplo', 1, '2025-12-31 23:59:59');

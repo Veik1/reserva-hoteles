@@ -55,6 +55,7 @@ public class ReservaController {
         return reservaService.obtenerPorHotelPaginado(hotelId, page, size);
     }
 
+    // GET by ID
     @GetMapping("/{id}")
     public ResponseEntity<Reserva> obtenerReserva(@PathVariable Long id) {
         return reservaService.obtenerPorId(id)
