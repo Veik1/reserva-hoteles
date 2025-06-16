@@ -63,6 +63,7 @@ git clone https://github.com/Veik1/reserva-hoteles.git
 cd reserva-hoteles
 ```
 
+<<<<<<< HEAD
 ---
 
 ### 2. Backend: compila y prueba la app localmente
@@ -76,6 +77,17 @@ Esto ejecuta todos los tests (usando H2) y genera el JAR en `target/`.
 ---
 
 ### 3. Backend: levanta la base de datos y el backend con Docker Compose
+=======
+### 2. Compila y prueba la app localmente
+
+```sh
+mvn clean package
+```
+
+Esto ejecuta todos los tests (usando H2) y genera el JAR en `target/`.
+
+### 3. Levanta la base de datos y el backend con Docker Compose
+>>>>>>> 79d9fb5dbfae571d1cd14d452517f5a7cf174da0
 
 ```sh
 docker compose up --build
@@ -85,6 +97,7 @@ Esto construye la imagen del backend y levanta PostgreSQL y la app.
 
 ---
 
+<<<<<<< HEAD
 ### 4. Frontend: instala dependencias y ejecuta
 
 ```sh
@@ -101,6 +114,10 @@ El frontend quedará disponible en [http://localhost:5173](http://localhost:5173
 
 - **Frontend:**  
   [http://localhost:5173](http://localhost:5173)
+=======
+## Acceso a la aplicación
+
+>>>>>>> 79d9fb5dbfae571d1cd14d452517f5a7cf174da0
 - **API y documentación Swagger:**  
   [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
 - **Base de datos PostgreSQL:**  
@@ -114,11 +131,16 @@ El frontend quedará disponible en [http://localhost:5173](http://localhost:5173
 
 ## Seguridad
 
+<<<<<<< HEAD
 - **JWT + Refresh Token**
+=======
+- **HTTP Basic Auth**
+>>>>>>> 79d9fb5dbfae571d1cd14d452517f5a7cf174da0
 - **Usuario:** `usuario`
 - **Contraseña:** `1234`
 - **Usuario admin:** `admin` / `admin`
 - Los roles y accesos están definidos en [`SecurityConfig.java`](src/main/java/com/hotel/config/SecurityConfig.java)
+<<<<<<< HEAD
 - El frontend maneja automáticamente la expiración del JWT y solicita uno nuevo usando el refresh token.
 
 ---
@@ -174,6 +196,8 @@ curl -X POST http://localhost:8080/api/auth/refresh \
 - Ve a [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
 - Haz clic en "Authorize" e ingresa:  
   `Bearer TU_TOKEN_AQUI`
+=======
+>>>>>>> 79d9fb5dbfae571d1cd14d452517f5a7cf174da0
 
 ---
 
@@ -198,6 +222,7 @@ mvn clean test
 
 - El backend usa PostgreSQL en producción y H2 en memoria para pruebas.
 - Las migraciones Flyway crean y llenan la base de datos automáticamente.
+<<<<<<< HEAD
 - Seguridad JWT (usuario: `usuario`, contraseña: `1234`).
 - Puedes explorar y probar la API desde Swagger UI.
 - Los tests de integración usan datos aleatorios y nunca chocan con los seeds.
@@ -247,3 +272,10 @@ npm run dev
 - Si quieres probar la API directamente, usa Swagger en [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
 
 ---
+=======
+- Seguridad básica HTTP Basic (usuario: `usuario`, contraseña: `1234`).
+- Puedes explorar y probar la API desde Swagger UI.
+- Los tests de integración usan datos aleatorios y nunca chocan con los seeds.
+
+---
+>>>>>>> 79d9fb5dbfae571d1cd14d452517f5a7cf174da0
