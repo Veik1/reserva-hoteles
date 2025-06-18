@@ -47,8 +47,10 @@ CREATE TABLE usuario (
     id BIGSERIAL PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(100) NOT NULL,
-    role VARCHAR(20) NOT NULL,
     activo BOOLEAN NOT NULL DEFAULT TRUE,
+    enabled BOOLEAN NOT NULL DEFAULT TRUE,
+    role VARCHAR(50) NOT NULL DEFAULT 'USER',
+    cliente_id BIGINT REFERENCES cliente(id),
     created_at TIMESTAMP,
     updated_at TIMESTAMP
 );

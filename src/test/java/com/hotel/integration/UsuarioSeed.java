@@ -1,4 +1,3 @@
-// filepath: src/test/java/com/hotel/seed/UsuarioSeed.java
 package com.hotel.integration;
 
 import com.hotel.model.Usuario;
@@ -7,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestComponent;
 
 import jakarta.annotation.PostConstruct;
-import java.util.Set;
 
 @TestComponent
 public class UsuarioSeed {
@@ -20,9 +18,9 @@ public class UsuarioSeed {
         if (usuarioRepository.findByUsername("admin") == null) {
             Usuario admin = new Usuario();
             admin.setUsername("admin");
-            admin.setPassword("admin"); // texto plano
+            admin.setPassword("admin");
+            admin.setRole("ADMIN"); // Cambiado aquí
             admin.setEnabled(true);
-            admin.setRoles(Set.of("ROLE_ADMIN"));
             usuarioRepository.save(admin);
         }
     }

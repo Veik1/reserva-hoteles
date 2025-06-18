@@ -11,7 +11,6 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.*;
 
 import java.util.Map;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -34,8 +33,9 @@ class SecurityIntegrationTest {
                         admin = new Usuario();
                         admin.setUsername("admin");
                         admin.setPassword("admin");
-                        admin.setRoles(Set.of("ADMIN"));
+                        admin.setRole("ADMIN"); // Cambiado aquí
                         admin.setEnabled(true);
+                        admin.setCliente(null);
                         usuarioRepository.save(admin);
                 }
         }

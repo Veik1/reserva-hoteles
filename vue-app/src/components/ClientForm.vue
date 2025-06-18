@@ -1,35 +1,31 @@
 <template>
-    <form @submit.prevent="onSubmit" class="form" aria-label="Formulario hotel">
+    <form @submit.prevent="onSubmit" class="form" aria-label="Formulario cliente">
         <label for="nombre">Nombre:</label>
-        <input id="nombre" v-model="localHotel.nombre" required />
-        <label for="ciudad">Ciudad:</label>
-        <input id="ciudad" v-model="localHotel.ciudad" required />
-        <label for="direccion">Dirección:</label>
-        <input id="direccion" v-model="localHotel.direccion" required />
-        <div class="form-actions">
-            <button type="submit" :disabled="loading">{{ submitText }}</button>
-            <button v-if="showCancel" type="button" @click="$emit('cancel')" :disabled="loading">Cancelar</button>
-        </div>
+        <input id="nombre" v-model="localClient.nombre" required />
+        <label for="email">Email:</label>
+        <input id="email" v-model="localClient.email" type="email" required />
+        <button type="submit" :disabled="loading">{{ submitText }}</button>
+        <button v-if="showCancel" type="button" @click="$emit('cancel')" :disabled="loading">Cancelar</button>
     </form>
 </template>
 
 <script setup>
 import { ref, watch } from 'vue'
 const props = defineProps({
-    hotel: { type: Object, default: () => ({ nombre: '', ciudad: '', direccion: '' }) },
+    client: { type: Object, default: () => ({ nombre: '', email: '' }) },
     loading: Boolean,
     submitText: { type: String, default: 'Guardar' },
     showCancel: Boolean
 })
 const emit = defineEmits(['submit', 'cancel'])
-const localHotel = ref({ ...props.hotel })
+const localClient = ref({ ...props.client })
 
-watch(() => props.hotel, (val) => {
-    localHotel.value = { ...val }
+watch(() => props.client, (val) => {
+    localClient.value = { ...val }
 })
 
 function onSubmit() {
-    emit('submit', { ...localHotel.value })
+    emit('submit', { ...localClient.value })
 }
 </script>
 
@@ -43,12 +39,6 @@ function onSubmit() {
     flex-direction: column;
     gap: 0.5rem;
     max-width: 400px;
-}
-
-.form-actions {
-    display: flex;
-    gap: 0.5rem;
-    margin-top: 0.5rem;
 }
 
 input {
@@ -66,6 +56,7 @@ button {
     padding: 0.5rem 1.2rem;
     cursor: pointer;
     transition: background 0.2s;
+    margin-right: 0.3rem;
 }
 
 button:disabled {

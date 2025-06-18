@@ -1,46 +1,28 @@
 <template>
   <section>
     <h2>Administrar Habitaciones</h2>
-    <form @submit.prevent="addRoom" aria-label="Agregar habitación">
-      <input v-model="nuevaHabitacion.numero" placeholder="Número" required />
-      <input v-model="nuevaHabitacion.tipo" placeholder="Tipo" required />
-      <input v-model="nuevaHabitacion.hotelId" placeholder="ID Hotel" required />
-      <button type="submit" :disabled="loading">{{ loading ? 'Agregando...' : 'Agregar Habitación' }}</button>
-    </form>
-    <AlertMessage :message="error" type="error" />
-    <AlertMessage :message="success" type="success" />
+    <RoomForm :room="editId ? editRoom : nuevaHabitacion" :loading="loading"
+      :submitText="editId ? 'Actualizar' : 'Agregar Habitación'" :showCancel="!!editId"
+      @submit="editId ? updateRoom(editId, $event) : addRoom($event)" @cancel="cancelEdit" />
+    <AlertMessage :message="error" type="error" aria-live="polite" />
+    <AlertMessage :message="success" type="success" aria-live="polite" />
     <Spinner v-if="loading" />
-    <table class="table" aria-label="Lista de habitaciones">
-      <thead>
-        <tr>
-          <th>Número</th>
-          <th>Tipo</th>
-          <th>Hotel</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="room in rooms" :key="room.id">
-          <td>{{ room.numero }}</td>
-          <td>{{ room.tipo }}</td>
-          <td>{{ room.hotel?.nombre }}</td>
-          <td>
-            <button @click="remove(room.id)" aria-label="Eliminar habitación">Eliminar</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <RoomTable :rooms="rooms" @edit="startEdit" @delete="remove" />
   </section>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { getRooms, createRoom, deleteRoom } from '../services/api'
+import { getRooms, createRoom, updateRoom as apiUpdateRoom, deleteRoom } from '../services/api'
+import RoomForm from '../components/RoomForm.vue'
+import RoomTable from '../components/RoomTable.vue'
 import AlertMessage from '../components/AlertMessage.vue'
 import Spinner from '../components/Spinner.vue'
 
 const rooms = ref([])
 const nuevaHabitacion = ref({ numero: '', tipo: '', hotelId: '' })
+const editRoom = ref({ numero: '', tipo: '', hotelId: '' })
+const editId = ref(null)
 const error = ref('')
 const success = ref('')
 const loading = ref(false)
@@ -51,19 +33,19 @@ async function loadRooms() {
     const res = await getRooms()
     rooms.value = res.data
   } catch (e) {
-    error.value = 'Error al cargar habitaciones'
+    error.value = e.response?.data?.message || 'Error al cargar habitaciones'
   }
 }
 
-async function addRoom() {
+async function addRoom(room) {
   error.value = ''
   success.value = ''
   loading.value = true
   try {
     await createRoom({
-      numero: nuevaHabitacion.value.numero,
-      tipo: nuevaHabitacion.value.tipo,
-      hotel: { id: Number(nuevaHabitacion.value.hotelId) }
+      numero: room.numero,
+      tipo: room.tipo,
+      hotel: { id: Number(room.hotelId) }
     })
     success.value = 'Habitación agregada con éxito'
     nuevaHabitacion.value = { numero: '', tipo: '', hotelId: '' }
@@ -75,7 +57,44 @@ async function addRoom() {
   }
 }
 
+function startEdit(room) {
+  editId.value = room.id
+  editRoom.value = {
+    numero: room.numero,
+    tipo: room.tipo,
+    hotelId: room.hotel?.id || room.hotelId || ''
+  }
+  error.value = ''
+  success.value = ''
+}
+
+function cancelEdit() {
+  editId.value = null
+  editRoom.value = { numero: '', tipo: '', hotelId: '' }
+}
+
+async function updateRoom(id, room) {
+  error.value = ''
+  success.value = ''
+  loading.value = true
+  try {
+    await apiUpdateRoom(id, {
+      numero: room.numero,
+      tipo: room.tipo,
+      hotel: { id: Number(room.hotelId) }
+    })
+    success.value = 'Habitación actualizada con éxito'
+    editId.value = null
+    await loadRooms()
+  } catch (e) {
+    error.value = e.response?.data?.message || 'Error al actualizar habitación'
+  } finally {
+    loading.value = false
+  }
+}
+
 async function remove(id) {
+  if (!confirm('¿Eliminar esta habitación?')) return
   error.value = ''
   success.value = ''
   loading.value = true
@@ -117,15 +136,18 @@ onMounted(loadRooms)
   background: #dbeaf7;
 }
 
-form {
+.form {
   margin-bottom: 1.5rem;
   background: #f7fbfd;
   padding: 1rem;
   border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: 400px;
 }
 
 input {
-  margin-right: 0.5rem;
   margin-bottom: 0.5rem;
   border: 1px solid #b3c2cc;
   border-radius: 4px;
@@ -140,6 +162,7 @@ button {
   padding: 0.5rem 1.2rem;
   cursor: pointer;
   transition: background 0.2s;
+  margin-right: 0.3rem;
 }
 
 button:disabled {

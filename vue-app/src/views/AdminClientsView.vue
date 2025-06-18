@@ -1,14 +1,27 @@
 <template>
   <section>
     <h2>Administrar Clientes</h2>
-    <form @submit.prevent="addClient" aria-label="Agregar cliente">
-      <input v-model="nuevoCliente.nombre" placeholder="Nombre" required />
-      <input v-model="nuevoCliente.email" placeholder="Email" required />
-      <button type="submit" :disabled="loading">{{ loading ? 'Agregando...' : 'Agregar Cliente' }}</button>
+
+    <!-- Formulario Crear/Editar -->
+    <form @submit.prevent="editId ? updateClient(editId) : addClient()" aria-label="Formulario cliente" class="form">
+      <label for="nombre">Nombre:</label>
+      <input id="nombre" v-model="form.nombre" placeholder="Nombre" required autocomplete="off" />
+      <label for="email">Email:</label>
+      <input id="email" v-model="form.email" placeholder="Email" type="email" required autocomplete="off" />
+      <div class="form-actions">
+        <button type="submit" :disabled="loading">
+          {{ loading ? (editId ? 'Actualizando...' : 'Agregando...') : (editId ? 'Actualizar' : 'Agregar Cliente') }}
+        </button>
+        <button v-if="editId" type="button" @click="cancelEdit" :disabled="loading">
+          Cancelar
+        </button>
+      </div>
     </form>
-    <AlertMessage :message="error" type="error" />
-    <AlertMessage :message="success" type="success" />
+
+    <AlertMessage :message="error" type="error" aria-live="polite" />
+    <AlertMessage :message="success" type="success" aria-live="polite" />
     <Spinner v-if="loading" />
+
     <table class="table" aria-label="Lista de clientes">
       <thead>
         <tr>
@@ -22,7 +35,8 @@
           <td>{{ client.nombre }}</td>
           <td>{{ client.email }}</td>
           <td>
-            <button @click="remove(client.id)" aria-label="Eliminar cliente">Eliminar</button>
+            <button @click="startEdit(client)" :disabled="loading">Editar</button>
+            <button @click="remove(client.id)" :disabled="loading">Eliminar</button>
           </td>
         </tr>
       </tbody>
@@ -32,12 +46,13 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { getClients, createClient, deleteClient } from '../services/api'
+import { getClients, createClient, updateClient as apiUpdateClient, deleteClient } from '../services/api'
 import AlertMessage from '../components/AlertMessage.vue'
 import Spinner from '../components/Spinner.vue'
 
 const clients = ref([])
-const nuevoCliente = ref({ nombre: '', email: '' })
+const form = ref({ nombre: '', email: '' })
+const editId = ref(null)
 const error = ref('')
 const success = ref('')
 const loading = ref(false)
@@ -48,7 +63,7 @@ async function loadClients() {
     const res = await getClients()
     clients.value = res.data
   } catch (e) {
-    error.value = 'Error al cargar clientes'
+    error.value = e.response?.data?.message || 'Error al cargar clientes'
   }
 }
 
@@ -57,9 +72,9 @@ async function addClient() {
   success.value = ''
   loading.value = true
   try {
-    await createClient(nuevoCliente.value)
+    await createClient(form.value)
     success.value = 'Cliente agregado con éxito'
-    nuevoCliente.value = { nombre: '', email: '' }
+    resetForm()
     await loadClients()
   } catch (e) {
     error.value = e.response?.data?.message || 'Error al agregar cliente'
@@ -68,7 +83,35 @@ async function addClient() {
   }
 }
 
+function startEdit(client) {
+  editId.value = client.id
+  form.value = { nombre: client.nombre, email: client.email }
+  error.value = ''
+  success.value = ''
+}
+
+function cancelEdit() {
+  resetForm()
+}
+
+async function updateClient(id) {
+  error.value = ''
+  success.value = ''
+  loading.value = true
+  try {
+    await apiUpdateClient(id, form.value)
+    success.value = 'Cliente actualizado con éxito'
+    resetForm()
+    await loadClients()
+  } catch (e) {
+    error.value = e.response?.data?.message || 'Error al actualizar cliente'
+  } finally {
+    loading.value = false
+  }
+}
+
 async function remove(id) {
+  if (!confirm('¿Eliminar este cliente?')) return
   error.value = ''
   success.value = ''
   loading.value = true
@@ -81,6 +124,11 @@ async function remove(id) {
   } finally {
     loading.value = false
   }
+}
+
+function resetForm() {
+  editId.value = null
+  form.value = { nombre: '', email: '' }
 }
 
 onMounted(loadClients)
@@ -110,15 +158,24 @@ onMounted(loadClients)
   background: #dbeaf7;
 }
 
-form {
+.form {
   margin-bottom: 1.5rem;
   background: #f7fbfd;
   padding: 1rem;
   border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: 400px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
 }
 
 input {
-  margin-right: 0.5rem;
   margin-bottom: 0.5rem;
   border: 1px solid #b3c2cc;
   border-radius: 4px;
@@ -133,6 +190,7 @@ button {
   padding: 0.5rem 1.2rem;
   cursor: pointer;
   transition: background 0.2s;
+  margin-right: 0.3rem;
 }
 
 button:disabled {

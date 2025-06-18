@@ -1,45 +1,78 @@
-HELP.md
+# --- Java / Maven ---
 target/
-.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+!.mvn/wrapper/maven-wrapper.jar
+.mvn/wrapper/maven-wrapper.properties
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+*.log
+logs/
+*.gz
 
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
+# --- Node.js / Vue / Vite ---
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+dist/
+.vuepress/dist/
+.vite/
+coverage/
+.env
+.env.*
+*.local
+*.env.local
+*.env.*.local
 
-### IntelliJ IDEA ###
-.idea
+# --- IDEs ---
+# IntelliJ IDEA
+.idea/
 *.iws
 *.iml
 *.ipr
 
-### NetBeans ###
+# Eclipse/STS
+.apt_generated/
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans/
+.sts4-cache/
+
+# NetBeans
 /nbproject/private/
 /nbbuild/
 /dist/
 /nbdist/
 /.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
 
-### VS Code ###
+# VS Code
 .vscode/
 
-# Docker
+# --- Docker/Postgres ---
 docker_pgdata/
 pgdata/
 *.db
 
-# Logs
-*.log
-
-# Sistema operativo
+# --- OS files ---
 .DS_Store
 Thumbs.db
+
+# --- Test reports and coverage ---
+*.dumpstream
+*.txt
+*.xml
+surefire-reports/
+jacoco.exec
+
+# --- Generated sources ---
+target/generated-sources/
+target/generated-test-sources/
+
+# --- Misc ---
+HELP.md
+
+# --- Exclude by pattern ---
+# (add more as needed)

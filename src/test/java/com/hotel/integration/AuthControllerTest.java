@@ -5,14 +5,12 @@ import com.hotel.repository.UsuarioRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import com.hotel.config.TestSecurityConfig;
 import org.springframework.context.annotation.Import;
-
-import java.util.Set;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -35,8 +33,9 @@ class AuthControllerTest {
                         admin = new Usuario();
                         admin.setUsername("admin");
                         admin.setPassword("admin");
-                        admin.setRoles(Set.of("ADMIN"));
+                        admin.setRole("ADMIN");
                         admin.setEnabled(true);
+                        admin.setCliente(null);
                         usuarioRepository.save(admin);
                 }
         }

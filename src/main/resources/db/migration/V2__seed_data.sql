@@ -54,7 +54,14 @@ INSERT INTO reserva (fecha_inicio, fecha_fin, cliente_id, habitacion_id, hotel_i
   ('2025-11-10', '2025-11-15', 3007, 2012, 1004, true),
   ('2025-12-01', '2025-12-10', 3008, 2015, 1005, true);
 
--- Usuarios
-INSERT INTO usuario (id, username, password, role, activo) VALUES
-  (1, 'admin', 'admin', 'ADMIN', true),
-  (2, 'usuario', '1234', 'USER', true);
+-- Usuarios (admin sin cliente, usuarios normales asociados a clientes)
+INSERT INTO usuario (id, username, password, activo, enabled, role, cliente_id) VALUES
+  (1, 'admin', 'admin', true, true, 'ADMIN', NULL),
+  (2, 'seed.juan@mail.com', '1234', true, true, 'USER', 3001),
+  (3, 'seed.ana@mail.com', '1234', true, true, 'USER', 3002),
+  (4, 'seed.carlos@mail.com', '1234', true, true, 'USER', 3003),
+  (5, 'seed.lucia@mail.com', '1234', true, true, 'USER', 3004),
+  (6, 'seed.mariana@mail.com', '1234', true, true, 'USER', 3005),
+  (7, 'seed.federico@mail.com', '1234', true, true, 'USER', 3006),
+  (8, 'seed.sofia@mail.com', '1234', true, true, 'USER', 3007),
+  (9, 'seed.martin@mail.com', '1234', true, true, 'USER', 3008);

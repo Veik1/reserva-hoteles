@@ -2,8 +2,6 @@ package com.hotel.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import java.util.Objects;
-import java.util.Set;
 
 @Entity
 public class Usuario {
@@ -12,24 +10,32 @@ public class Usuario {
     private Long id;
 
     @NotBlank
-    private String username;
+    @Column(unique = true)
+    private String username; // Usar el email del cliente como username
 
     @NotBlank
     private String password;
 
+    private Boolean activo = true;
     private Boolean enabled = true;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    private Set<String> roles;
+    @OneToOne
+    @JoinColumn(name = "cliente_id")
+    private Cliente cliente;
+
+    @NotBlank
+    private String role; // "ADMIN" o "USER"
 
     public Usuario() {
     }
 
-    public Usuario(String username, String password, Set<String> roles, Boolean enabled) {
+    public Usuario(String username, String password, String role, Boolean activo, Boolean enabled, Cliente cliente) {
         this.username = username;
         this.password = password;
-        this.roles = roles;
+        this.role = role;
+        this.activo = activo;
         this.enabled = enabled;
+        this.cliente = cliente;
     }
 
     public Long getId() {
@@ -56,6 +62,14 @@ public class Usuario {
         this.password = password;
     }
 
+    public Boolean getActivo() {
+        return activo;
+    }
+
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
+    }
+
     public Boolean getEnabled() {
         return enabled;
     }
@@ -64,37 +78,19 @@ public class Usuario {
         this.enabled = enabled;
     }
 
-    public Set<String> getRoles() {
-        return roles;
+    public Cliente getCliente() {
+        return cliente;
     }
 
-    public void setRoles(Set<String> roles) {
-        this.roles = roles;
+    public void setCliente(Cliente cliente) {
+        this.cliente = cliente;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (!(o instanceof Usuario))
-            return false;
-        Usuario usuario = (Usuario) o;
-        return Objects.equals(id, usuario.id) &&
-                Objects.equals(username, usuario.username);
+    public String getRole() {
+        return role;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, username);
-    }
-
-    @Override
-    public String toString() {
-        return "Usuario{" +
-                "id=" + id +
-                ", username='" + username + '\'' +
-                ", enabled=" + enabled +
-                ", roles=" + roles +
-                '}';
+    public void setRole(String role) {
+        this.role = role;
     }
 }

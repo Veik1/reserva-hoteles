@@ -1,11 +1,11 @@
 <template>
-    <form @submit.prevent="onSubmit" class="form" aria-label="Formulario hotel">
-        <label for="nombre">Nombre:</label>
-        <input id="nombre" v-model="localHotel.nombre" required />
-        <label for="ciudad">Ciudad:</label>
-        <input id="ciudad" v-model="localHotel.ciudad" required />
-        <label for="direccion">Dirección:</label>
-        <input id="direccion" v-model="localHotel.direccion" required />
+    <form @submit.prevent="onSubmit" class="form" aria-label="Formulario habitación">
+        <label for="numero">Número:</label>
+        <input id="numero" v-model="localRoom.numero" type="number" required />
+        <label for="tipo">Tipo:</label>
+        <input id="tipo" v-model="localRoom.tipo" required />
+        <label for="hotelId">ID Hotel:</label>
+        <input id="hotelId" v-model="localRoom.hotelId" type="number" required />
         <div class="form-actions">
             <button type="submit" :disabled="loading">{{ submitText }}</button>
             <button v-if="showCancel" type="button" @click="$emit('cancel')" :disabled="loading">Cancelar</button>
@@ -16,20 +16,20 @@
 <script setup>
 import { ref, watch } from 'vue'
 const props = defineProps({
-    hotel: { type: Object, default: () => ({ nombre: '', ciudad: '', direccion: '' }) },
+    room: { type: Object, default: () => ({ numero: '', tipo: '', hotelId: '' }) },
     loading: Boolean,
     submitText: { type: String, default: 'Guardar' },
     showCancel: Boolean
 })
 const emit = defineEmits(['submit', 'cancel'])
-const localHotel = ref({ ...props.hotel })
+const localRoom = ref({ ...props.room })
 
-watch(() => props.hotel, (val) => {
-    localHotel.value = { ...val }
+watch(() => props.room, (val) => {
+    localRoom.value = { ...val }
 })
 
 function onSubmit() {
-    emit('submit', { ...localHotel.value })
+    emit('submit', { ...localRoom.value })
 }
 </script>
 

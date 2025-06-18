@@ -13,7 +13,6 @@ import com.hotel.model.Usuario;
 import com.hotel.repository.UsuarioRepository;
 
 import java.util.Map;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -37,8 +36,9 @@ class AuthIntegrationTest {
                         usuario = new Usuario();
                         usuario.setUsername("usuario");
                         usuario.setPassword("1234");
-                        usuario.setRoles(Set.of("USER"));
+                        usuario.setRole("USER"); // Cambiado aquí
                         usuario.setEnabled(true);
+                        // usuario.setCliente(cliente); // Si tienes un cliente de prueba, asócialo aquí
                         usuarioRepository.save(usuario);
                 }
         }

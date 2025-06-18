@@ -1,11 +1,15 @@
 <template>
-    <form @submit.prevent="onSubmit" class="form" aria-label="Formulario hotel">
-        <label for="nombre">Nombre:</label>
-        <input id="nombre" v-model="localHotel.nombre" required />
-        <label for="ciudad">Ciudad:</label>
-        <input id="ciudad" v-model="localHotel.ciudad" required />
-        <label for="direccion">Dirección:</label>
-        <input id="direccion" v-model="localHotel.direccion" required />
+    <form @submit.prevent="onSubmit" class="form" aria-label="Formulario reserva">
+        <label for="clienteId">ID Cliente:</label>
+        <input id="clienteId" v-model="localBooking.clienteId" type="number" required />
+        <label for="habitacionId">ID Habitación:</label>
+        <input id="habitacionId" v-model="localBooking.habitacionId" type="number" required />
+        <label for="hotelId">ID Hotel:</label>
+        <input id="hotelId" v-model="localBooking.hotelId" type="number" required />
+        <label for="fechaInicio">Desde:</label>
+        <input id="fechaInicio" v-model="localBooking.fechaInicio" type="date" required />
+        <label for="fechaFin">Hasta:</label>
+        <input id="fechaFin" v-model="localBooking.fechaFin" type="date" required />
         <div class="form-actions">
             <button type="submit" :disabled="loading">{{ submitText }}</button>
             <button v-if="showCancel" type="button" @click="$emit('cancel')" :disabled="loading">Cancelar</button>
@@ -16,20 +20,29 @@
 <script setup>
 import { ref, watch } from 'vue'
 const props = defineProps({
-    hotel: { type: Object, default: () => ({ nombre: '', ciudad: '', direccion: '' }) },
+    booking: {
+        type: Object,
+        default: () => ({
+            clienteId: '',
+            habitacionId: '',
+            hotelId: '',
+            fechaInicio: '',
+            fechaFin: ''
+        })
+    },
     loading: Boolean,
     submitText: { type: String, default: 'Guardar' },
     showCancel: Boolean
 })
 const emit = defineEmits(['submit', 'cancel'])
-const localHotel = ref({ ...props.hotel })
+const localBooking = ref({ ...props.booking })
 
-watch(() => props.hotel, (val) => {
-    localHotel.value = { ...val }
+watch(() => props.booking, (val) => {
+    localBooking.value = { ...val }
 })
 
 function onSubmit() {
-    emit('submit', { ...localHotel.value })
+    emit('submit', { ...localBooking.value })
 }
 </script>
 

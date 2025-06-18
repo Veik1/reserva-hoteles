@@ -10,13 +10,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import com.hotel.config.TestSecurityConfig;
-import org.springframework.context.annotation.Import;
-
-import java.util.Set;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.hotel.config.TestSecurityConfig;
+import org.springframework.context.annotation.Import;
 
 @Import(TestSecurityConfig.class)
 @SpringBootTest
@@ -39,8 +36,9 @@ class HotelIntegrationTest {
                         admin = new Usuario();
                         admin.setUsername("admin");
                         admin.setPassword("admin");
-                        admin.setRoles(Set.of("ADMIN"));
+                        admin.setRole("ADMIN"); // Cambiado aquí
                         admin.setEnabled(true);
+                        admin.setCliente(null);
                         usuarioRepository.save(admin);
                 }
         }

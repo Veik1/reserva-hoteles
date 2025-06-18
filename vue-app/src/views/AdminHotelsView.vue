@@ -1,46 +1,28 @@
 <template>
     <section>
         <h2>Administrar Hoteles</h2>
-        <form @submit.prevent="addHotel" aria-label="Agregar hotel">
-            <input v-model="nuevoHotel.nombre" placeholder="Nombre" required />
-            <input v-model="nuevoHotel.ciudad" placeholder="Ciudad" required />
-            <input v-model="nuevoHotel.direccion" placeholder="Dirección" required />
-            <button type="submit" :disabled="loading">{{ loading ? 'Agregando...' : 'Agregar Hotel' }}</button>
-        </form>
-        <AlertMessage :message="error" type="error" />
-        <AlertMessage :message="success" type="success" />
+        <HotelForm :hotel="editId ? editHotel : nuevoHotel" :loading="loading"
+            :submitText="editId ? 'Actualizar' : 'Agregar Hotel'" :showCancel="!!editId"
+            @submit="editId ? updateHotel(editId, $event) : addHotel($event)" @cancel="cancelEdit" />
+        <AlertMessage :message="error" type="error" aria-live="polite" />
+        <AlertMessage :message="success" type="success" aria-live="polite" />
         <Spinner v-if="loading" />
-        <table class="table" aria-label="Lista de hoteles">
-            <thead>
-                <tr>
-                    <th>Nombre</th>
-                    <th>Ciudad</th>
-                    <th>Dirección</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="hotel in hotels" :key="hotel.id">
-                    <td>{{ hotel.nombre }}</td>
-                    <td>{{ hotel.ciudad }}</td>
-                    <td>{{ hotel.direccion }}</td>
-                    <td>
-                        <button @click="remove(hotel.id)" aria-label="Eliminar hotel">Eliminar</button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <HotelTable :hotels="hotels" @edit="startEdit" @delete="remove" />
     </section>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { getHotels, createHotel, deleteHotel } from '../services/api'
+import { getHotels, createHotel, updateHotel as apiUpdateHotel, deleteHotel } from '../services/api'
+import HotelForm from '../components/HotelForm.vue'
+import HotelTable from '../components/HotelTable.vue'
 import AlertMessage from '../components/AlertMessage.vue'
 import Spinner from '../components/Spinner.vue'
 
 const hotels = ref([])
 const nuevoHotel = ref({ nombre: '', ciudad: '', direccion: '' })
+const editHotel = ref({ nombre: '', ciudad: '', direccion: '' })
+const editId = ref(null)
 const error = ref('')
 const success = ref('')
 const loading = ref(false)
@@ -51,16 +33,16 @@ async function loadHotels() {
         const res = await getHotels()
         hotels.value = res.data
     } catch (e) {
-        error.value = 'Error al cargar hoteles'
+        error.value = e.response?.data?.message || 'Error al cargar hoteles'
     }
 }
 
-async function addHotel() {
+async function addHotel(hotel) {
     error.value = ''
     success.value = ''
     loading.value = true
     try {
-        await createHotel(nuevoHotel.value)
+        await createHotel(hotel)
         success.value = 'Hotel agregado con éxito'
         nuevoHotel.value = { nombre: '', ciudad: '', direccion: '' }
         await loadHotels()
@@ -71,7 +53,36 @@ async function addHotel() {
     }
 }
 
+function startEdit(hotel) {
+    editId.value = hotel.id
+    editHotel.value = { ...hotel }
+    error.value = ''
+    success.value = ''
+}
+
+function cancelEdit() {
+    editId.value = null
+    editHotel.value = { nombre: '', ciudad: '', direccion: '' }
+}
+
+async function updateHotel(id, hotel) {
+    error.value = ''
+    success.value = ''
+    loading.value = true
+    try {
+        await apiUpdateHotel(id, hotel)
+        success.value = 'Hotel actualizado con éxito'
+        editId.value = null
+        await loadHotels()
+    } catch (e) {
+        error.value = e.response?.data?.message || 'Error al actualizar hotel'
+    } finally {
+        loading.value = false
+    }
+}
+
 async function remove(id) {
+    if (!confirm('¿Eliminar este hotel?')) return
     error.value = ''
     success.value = ''
     loading.value = true
@@ -113,15 +124,18 @@ onMounted(loadHotels)
     background: #dbeaf7;
 }
 
-form {
+.form {
     margin-bottom: 1.5rem;
     background: #f7fbfd;
     padding: 1rem;
     border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-width: 400px;
 }
 
 input {
-    margin-right: 0.5rem;
     margin-bottom: 0.5rem;
     border: 1px solid #b3c2cc;
     border-radius: 4px;
@@ -136,6 +150,7 @@ button {
     padding: 0.5rem 1.2rem;
     cursor: pointer;
     transition: background 0.2s;
+    margin-right: 0.3rem;
 }
 
 button:disabled {
