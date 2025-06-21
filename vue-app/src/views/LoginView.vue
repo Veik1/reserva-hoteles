@@ -23,7 +23,6 @@
 <script setup>
 import { ref, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
-import { login } from '../services/api'
 import { useAuthStore } from '../store/auth'
 
 const username = ref('')
@@ -37,16 +36,11 @@ async function onLogin() {
     error.value = ''
     loading.value = true
     try {
-        const res = await login({ username: username.value, password: password.value })
-        auth.username = username.value
-        auth.role = res.data.role || ''
-        auth.cliente_id = res.data.cliente_id || null
+        await auth.login(username.value, password.value)
         router.push('/')
     } catch (e) {
         error.value =
-            e?.response?.data?.error ||
-            e?.response?.data?.message ||
-            e.message ||
+            e?.message ||
             'Usuario o contraseña incorrectos'
         await nextTick()
         document.getElementById('login-error')?.focus()

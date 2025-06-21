@@ -5,8 +5,16 @@
             <li><router-link to="/">Inicio</router-link></li>
             <li><router-link to="/hoteles">Hoteles</router-link></li>
             <li><router-link to="/habitaciones">Habitaciones</router-link></li>
-            <li><router-link to="/clientes">Clientes</router-link></li>
-            <li><router-link to="/reservas">Reservas</router-link></li>
+
+            <!-- Vista cliente: solo si está logueado y no es admin -->
+            <li v-if="auth.user && auth.role !== 'admin'">
+                <router-link to="/reservas">Mis Reservas</router-link>
+            </li>
+            <li v-if="auth.user && auth.role !== 'admin'">
+                <router-link to="/clientes">Mi Perfil</router-link>
+            </li>
+
+            <!-- Vista admin -->
             <li v-if="auth.role === 'admin'">
                 <router-link to="/admin/hoteles">Admin Hoteles</router-link>
             </li>
@@ -19,6 +27,8 @@
             <li v-if="auth.role === 'admin'">
                 <router-link to="/admin/reservas">Admin Reservas</router-link>
             </li>
+
+            <!-- Login/Logout -->
             <li v-if="auth.user">
                 <a href="#" @click.prevent="logout">Salir ({{ auth.user }})</a>
             </li>

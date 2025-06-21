@@ -2,17 +2,21 @@
     <main class="register-container" aria-label="Registrarse">
         <h2>Registrarse</h2>
         <form @submit.prevent="onRegister" autocomplete="on">
-            <label for="username">Usuario</label>
-            <input id="username" v-model="username" required autocomplete="username" :aria-invalid="!!error"
+            <label for="nombre">Nombre</label>
+            <input id="nombre" v-model="nombre" required autocomplete="name" :aria-invalid="!!error"
+                :aria-describedby="error ? 'register-error' : null" />
+
+            <label for="email">Email</label>
+            <input id="email" type="email" v-model="email" required autocomplete="email" :aria-invalid="!!error"
+                :aria-describedby="error ? 'register-error' : null" />
+
+            <label for="dni">DNI</label>
+            <input id="dni" v-model="dni" required autocomplete="off" :aria-invalid="!!error"
                 :aria-describedby="error ? 'register-error' : null" />
 
             <label for="password">Contraseña</label>
             <input id="password" type="password" v-model="password" required autocomplete="new-password"
                 :aria-invalid="!!error" :aria-describedby="error ? 'register-error' : null" />
-
-            <label for="email">Email</label>
-            <input id="email" type="email" v-model="email" required autocomplete="email" :aria-invalid="!!error"
-                :aria-describedby="error ? 'register-error' : null" />
 
             <button type="submit" :disabled="loading" aria-busy="loading"
                 :aria-label="loading ? 'Registrando...' : 'Registrarse'">
@@ -34,9 +38,10 @@ import { ref, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { register } from '../services/api'
 
-const username = ref('')
-const password = ref('')
+const nombre = ref('')
 const email = ref('')
+const dni = ref('')
+const password = ref('')
 const error = ref('')
 const success = ref('')
 const loading = ref(false)
@@ -47,11 +52,12 @@ async function onRegister() {
     success.value = ''
     loading.value = true
     try {
-        await register({ username: username.value, password: password.value, email: email.value })
+        await register({ nombre: nombre.value, email: email.value, dni: dni.value, password: password.value })
         success.value = 'Registro exitoso. Ahora puedes iniciar sesión.'
-        username.value = ''
-        password.value = ''
+        nombre.value = ''
         email.value = ''
+        dni.value = ''
+        password.value = ''
         setTimeout(() => router.push('/login'), 1500)
     } catch (e) {
         error.value =

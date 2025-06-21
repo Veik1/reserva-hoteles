@@ -13,10 +13,10 @@ export const useAuthStore = defineStore('auth', {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password })
             })
-            if (!res.ok) throw new Error('Credenciales inválidas')
             const data = await res.json()
+            if (!res.ok) throw new Error(data.error || 'Credenciales inválidas')
             this.user = username
-            this.role = data.role || null
+            this.role = data.role
             this.cliente_id = data.cliente_id || null
         },
         logout() {

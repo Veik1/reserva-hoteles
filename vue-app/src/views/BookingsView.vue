@@ -166,13 +166,43 @@ async function fetchBookings() {
 }
 
 async function onSubmit() {
+    // Validaciones frontend
+    const { fecha_inicio, fecha_fin, habitacion_id, hotel_id } = form.value
+    error.value = ''
+
+    if (!hotel_id || !habitacion_id || !fecha_inicio || !fecha_fin) {
+        error.value = 'Completa todos los campos obligatorios.'
+        return
+    }
+
+    const hoy = new Date()
+    hoy.setHours(0, 0, 0, 0)
+    const inicio = new Date(fecha_inicio)
+    const fin = new Date(fecha_fin)
+
+    if (inicio < hoy) {
+        error.value = 'La fecha de inicio no puede ser anterior a hoy.'
+        return
+    }
+    if (fin < inicio) {
+        error.value = 'La fecha de fin no puede ser anterior a la de inicio.'
+        return
+    }
+
     try {
-        form.value.cliente_id = auth.cliente_id // siempre usa el del store
+        // Armar el payload como espera el backend
+        const payload = {
+            fechaInicio: form.value.fecha_inicio,
+            fechaFin: form.value.fecha_fin,
+            cliente: { id: auth.cliente_id },
+            habitacion: { id: form.value.habitacion_id },
+            hotel: { id: form.value.hotel_id }
+        }
         if (editMode.value) {
-            await updateBooking(editId.value, { ...form.value })
+            await updateBooking(editId.value, payload)
             error.value = ''
         } else {
-            await createBooking({ ...form.value })
+            await createBooking(payload)
             error.value = ''
         }
         await fetchBookings()
