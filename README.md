@@ -167,13 +167,3 @@ npm run format   # Formatea el código con Prettier
 - La base de datos PostgreSQL queda en el puerto 5432
 
 ---
-
-## Notas importantes
-
-- **Este proyecto es solo para fines de aprendizaje/demostración.**  
-  No uses autenticación en texto plano en producción.
-- El backend y frontend están desacoplados y se comunican vía API REST.
-- El frontend no almacena ni maneja tokens.
-- El backend no expone endpoints de refresh ni de gestión de tokens.
-
----
